@@ -244,6 +244,7 @@
             const prompt = document.getElementById('prompt');
             prompt.innerText='';
             const endDatePrompt = document.getElementById('endDatePrompt');
+            endDatePrompt.innerText='';
             const startType=document.querySelector('input[name="startTypeRadio"]:checked').value;
             const submitButton=document.getElementById('submit');
             submitButton.style.display='none';
@@ -357,6 +358,7 @@
                                 isInValidStartDateHandler = createInValidStartDateHandler(prds);                                
                                 startDateSel.addEventListener('change',isInValidStartDateHandler);  
                                 
+                                
                                 //课程结束日校验
                                 if(isInValidEndDateNewHandler){
                                     endDateSel.removeEventListener('change',isInValidEndDateNewHandler);
@@ -413,17 +415,20 @@
         }
 
         function isInValidStartDate(prds){
-            const today=new Date();
+            
+            const _today=new Date();
+            const today = new Date(_today.getFullYear(), _today.getMonth(), _today.getDate());
             const startDateSel=document.getElementById('startDate');
+            startDateSel.disabled=false;
             const endDateSel=document.getElementById('endDate');
             const selectBuyCodeContainer=document.getElementById('selectBuyCodeContainer');   
             const cardId=selectBuyCodeContainer.value;
-            const selectStartDate=startDateSel.value;
-            const selectEndDate=endDateSel.value;
-            
-            const endDatePrompt=document.getElementById('endDatePrompt');
-            
-            if(new Date(selectStartDate)<today){
+            const selectStartDate=new Date(startDateSel.value);        
+            const selectEndDate=endDateSel.value;            
+            const endDatePrompt=document.getElementById('endDatePrompt');            
+
+            if(new Date(selectStartDate.getFullYear(), selectStartDate.getMonth(), selectStartDate.getDate())<today){
+                
                 selectDate(today,'startDate','date');
                 endDatePrompt.innerText='选择的开始日不能早于今天，已修改。';
             }else{
@@ -432,6 +437,7 @@
             const endDateRes=calculateDate(startDateSel.value,parseInt(prds[selectBuyCodeContainer.value]))
             console.log(endDateRes)
             selectDate(endDateRes,'endDate','date');
+            
 
         }
         
