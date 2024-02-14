@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>铭湖健身客户信息查询</title>
+    <title>鹿鹿泽健身客户信息查询</title>
     <link rel="stylesheet" href="../static/css/minghu.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
@@ -15,6 +15,9 @@
         <ul id="cusNameResultList"></ul>
         <p></p>
 
+        <button onclick="get_cus_buy()">查看购课记录</button>
+        <div id="buyHistory" class="buy-list"></div>
+
         <h3>购课日期</h3>
         <div id="date">
             <form>
@@ -26,7 +29,7 @@
         <h3>客户购课卡号</h3>
         <!-- <input type="text" id="buyCode" style="width: 190px;" oninput="isValidDate()" onclick="get_cus_buy()" > -->
         <select id="buyCodeSelect"></select>
-        <div id="buyHistory" class="buy-list"></div>
+        
         <div id="buyCodeErr" class="inline2"></div>
         <p></p>    
 
@@ -193,7 +196,7 @@
             })
             .then(response=>response.json())
             .then(jsonDataRes=>{
-                console.log(jsonDataRes)
+                console.log('get cus buy history:',jsonDataRes)
                 const tableContainer = document.getElementById('buyHistory');
                 tableContainer.innerHTML=''
                 const jsonData=jsonDataRes['buy_stat_list']
@@ -246,9 +249,17 @@
 
                                 const buyCode = jsonData[index][0]; // 课编码在第一列
                                 const notPayAmount=jsonData[index][4]; //未收金额
-                                console.log('购课编码:', buyCode);
-                                document.getElementById('buyCode').value=buyCode;
+                                // console.log('购课编码:', buyCode);
+                                // document.getElementById('buyCodeSelect').value=buyCode;
 
+                                //改写卡号的选择及相关设置
+                                document.getElementById('buyCodeSelect').innerHTML='';
+                                const cardIdOpt=document.createElement('option');
+                                cardIdOpt.value=buyCode;
+                                cardIdOpt.text=buyCode;
+                                document.getElementById('buyCodeSelect').appendChild(cardIdOpt);
+                                
+                                // if()
                                 
                                 const buyRecords=Object.keys(buy_list).map(key => (buy_list[key]));
                                 console.log(buyRecords);
@@ -452,7 +463,7 @@
             try{
                 if(submitCheck()==='True'){
                     const operateTime=new Date();
-                    console.log(insId,insName,'line429')
+                    // console.log(insId,insName,'line429')
                     const inputContents=document.getElementById('inputContents');
                     const inputElements=inputContents.querySelectorAll('input');
                     const dataKey=['客户编码及姓名','收款日期','购课节数','购课时长（天）','应收金额','实收金额','备注'];
@@ -460,7 +471,7 @@
                     let data={};
                     // data加入输入的内容    
                     inputElements.forEach((input)=>{
-                        console.log(input.value);
+                        // console.log(input.value);
                         data[dataKey[n]]=input.value;
                         n+=1;
                     });   
@@ -472,9 +483,9 @@
                     data['operatorId']=insId;
                     data['operateTime']=dateToString(operateTime,'dateTime');
 
-                    // 非限时课程，时长设置为99999天
+                    // 非限时课程，时长设置为999天
                     if(['常规私教课','常规团课'].includes(data['购课类型'])){
-                        data['购课时长（天）']=9999;
+                        data['购课时长（天）']=999;
                     }
 
                     //改写页面的状态提示
@@ -662,14 +673,14 @@
                         fetch('/deal_start_limit_page', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'text/plain'
+                                'Content-Type': 'application/json'
                                 },
-                            body:name
+                            body:JSON.stringify({'cus_name':selectedName})
                             })
                             .then(response => response.json())
                             .then(data => {
                         //将data赋值给块变量cus_list，供后面的handleInput使用
-                            console.log(data);
+                            console.log('buy list:',data);
                             buy_list=data['buy_list'];})
                             .catch(error=>{
                                 console.error('读取购课记录错误：',error)

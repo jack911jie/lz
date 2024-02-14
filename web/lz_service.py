@@ -25,10 +25,10 @@ import hashlib
 import base64
 
 
-class MinghuService(Flask):
+class LzService(Flask):
 
     def __init__(self,*args,**kwargs):
-        super(MinghuService, self).__init__(*args, **kwargs)
+        super(LzService, self).__init__(*args, **kwargs)
         config_fn=os.path.join(os.path.join(os.path.dirname(__file__),'config','lz_service.config'))
         # self.config_lz=readconfig.exp_json2(config_fn)
         with open(config_fn,'r',encoding='utf-8') as f:
@@ -369,7 +369,7 @@ class MinghuService(Flask):
        
 
     def get_book_data_db(self):
-        print('from minghu database,get ins book data')
+        print('from llz database,get ins book data')
         data=request.json
         # print(data)
         conn=self.connect_mysql()
@@ -1177,7 +1177,7 @@ class MinghuService(Flask):
    
     def get_cus_buy_db(self):
         # cus_name=request.data.decode('utf-8')
-        print('from minghu database,get_cus_buy_statistics')
+        print('from llz database,get_cus_buy_statistics')
         cus_id_name=request.data.decode('utf-8')
         # cus_id_name='MH00113肖婕'
         cus_id,cus_name=cus_id_name[:7],cus_id_name[7:]
@@ -1185,7 +1185,7 @@ class MinghuService(Flask):
         conn=self.connect_mysql()
         cursor=conn.cursor()
         sql=f'''SELECT 
-                    buy_code,
+                    card_id,
                     AVG(pay) AS 平均应收金额,
                     SUM(real_pay) AS 总实收金额,
                     MIN(buy_type) AS 购课类型,
@@ -1196,7 +1196,7 @@ class MinghuService(Flask):
                 WHERE
                     cus_name='{cus_name}' and cus_id='{cus_id}'
                 GROUP BY
-                    buy_code;
+                    card_id;
         '''
         cursor.execute(sql)
         buy_stat=cursor.fetchall()
@@ -1382,7 +1382,11 @@ class MinghuService(Flask):
         print('get buy history via deal_start_limit_page_db()')
         data=request.json
         cus_id_name=data['cus_name']
-        cls_tkn_time=datetime.datetime.strptime(data['cls_tkn_time'],'%Y-%m-%dT%H:%M')
+        # input_buy页面的数据没有cls_tkn_time
+        try:
+            cls_tkn_time=datetime.datetime.strptime(data['cls_tkn_time'],'%Y-%m-%dT%H:%M')
+        except:
+            cls_tkn_time=''
         cus_id,cus_name=cus_id_name[:7],cus_id_name[7:]
         conn=self.connect_mysql() 
         cursor=conn.cursor()
@@ -1457,7 +1461,7 @@ class MinghuService(Flask):
         sql='''
         SELECT 
             filtered_a.card_id, max(cards_table.end_time) as end_time,
-            sum(cards_table.cls_qty) - IFNULL(b_count.times, 0) as remain_qty
+            max(cards_table.cls_qty) - IFNULL(b_count.times, 0) as remain_qty
         FROM (
             SELECT DISTINCT card_id 
             FROM cards_table
@@ -1859,7 +1863,7 @@ class MinghuService(Flask):
         # fn=os.path.join(self.config_lz['work_dir'],'05-专业资料','训练项目.xlsx')
         # df=pd.read_excel(fn,sheet_name='训练项目')
         # df.fillna('',inplace=True)
-        print('from minghu database,get train item list.')
+        print('from llz database,get train item list.')
         conn=self.connect_mysql()
         cursor = conn.cursor()
 
@@ -2013,7 +2017,7 @@ class MinghuService(Flask):
 
     def get_template_info_db(self):
         # 创建一个游标对象
-        print('from minghu database,from template_info.')
+        print('from llz database,from template_info.')
         conn=self.connect_mysql()
         cursor = conn.cursor()
 
@@ -2056,7 +2060,7 @@ class MinghuService(Flask):
         return jsonify(dic_li)
 
     def get_cus_list_db(self):
-        print('from minghu database, get cus list')
+        print('from llz database, get cus list')
         conn=self.connect_mysql()
         cursor = conn.cursor()
 
@@ -2085,7 +2089,7 @@ class MinghuService(Flask):
 
     def get_ins_list_db(self):
          # 创建一个游标对象
-        print('from minghu database,get ins list.')
+        print('from llz database,get ins list.')
         conn=self.connect_mysql()
         cursor = conn.cursor()
 
@@ -2146,7 +2150,7 @@ class MinghuService(Flask):
     def get_cus_info_db(self):
         cus_id_name=request.json.get('selected_name')
         cus_id,cus_name=cus_id_name[:7],cus_id_name[7:]
-        print('from minghu database, get cus list')
+        print('from llz database, get cus list')
         conn=self.connect_mysql()
         cursor = conn.cursor()
 
@@ -2878,8 +2882,8 @@ class FERROR(Exception):
     pass
 
 if __name__ == '__main__':
-    app = MinghuService(__name__)
-    app.secret_key='minghu8888 '
+    app = LzService(__name__)
+    app.secret_key='lz8888'
     if len(sys.argv)>1:
         print(f'服务器为：{sys.argv[1]}:5000')
         app.run(debug=True,host=sys.argv[1],port=5000)

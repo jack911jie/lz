@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>铭湖健身客户预约登记</title>
+    <title>鹿鹿泽健身客户预约登记</title>
     <link rel="stylesheet" href="../static/css/minghu.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
@@ -9,7 +9,7 @@
 <body>
     {% include 'show_ins_info.html' %}
     <div>
-        <div><h4>铭湖健身客户预约登记</h4></div>
+        <div><h4>鹿鹿泽健身客户预约登记</h4></div>
         <div style="display:inline-block"><h5>日期：<input type="date" id="dateInput" name="dateInput" onchange="showWeekDay();get_book_data();"></h5></div> <div id="dayBlock" style="display:inline-block;color:burlywood"></div>
         <br>
         <div id='insListBlock' style="display:inline-block"><h5 style="display:inline-block">教练姓名：</h5><select style="display:inline-block;font-size:13px;" id='insSelect' onchange="get_book_data()"></select></div>
