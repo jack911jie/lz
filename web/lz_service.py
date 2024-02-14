@@ -1186,11 +1186,13 @@ class LzService(Flask):
         cursor=conn.cursor()
         sql=f'''SELECT 
                     card_id,
-                    AVG(pay) AS 平均应收金额,
+ 
+                    SUM(pay) AS 总应收金额,
                     SUM(real_pay) AS 总实收金额,
                     MIN(buy_type) AS 购课类型,
                     GROUP_CONCAT(DISTINCT DATE_FORMAT(buy_date, '%Y/%m/%d') ORDER BY buy_date ASC SEPARATOR '\n') AS 收款日期列表,
                     COUNT(*) AS 收款次数
+                    
                 FROM
                     buy_rec_table
                 WHERE

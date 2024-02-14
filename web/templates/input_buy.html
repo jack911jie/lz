@@ -618,6 +618,8 @@
         }
 
         function handleInput() {
+            hide_cus_buy();
+            document.getElementById('buyCodeSelect').innerHTML='';
             // 获取输入框中的值
             const searchTerm = document.getElementById("cusNameInput").value.trim();
             const UpperSearchTerm=searchTerm.toUpperCase();
@@ -657,6 +659,12 @@
                         // const buyCodeErr=document.getElementById('buyCodeErr');
                         // buyCode.value='';
                         // buyCodeErr.innerText='';
+                        
+                        document.getElementById('buyType').disabled=false;
+                        document.getElementById('buyNum').disabled=false;
+                        document.getElementById('buyDays').disabled=false;
+                        document.getElementById('pay').disabled=false;
+
 
                         // 检查课程类型，给出提示
                         showBuyTypePrompt();
