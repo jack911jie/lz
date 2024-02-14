@@ -1475,6 +1475,7 @@ class LzService(Flask):
             AND card_type=%s
             AND card_name=%s
             AND end_time>=%s
+            AND card_start_time<=%s
         ) AS filtered_a
         LEFT JOIN (
             SELECT card_id, COUNT(card_id) as times
@@ -1486,7 +1487,7 @@ class LzService(Flask):
         '''
         
         try:
-            cursor.execute(sql,(cus_id,'limit_prd','私教',cls_tkn_time))
+            cursor.execute(sql,(cus_id,'limit_prd','私教',cls_tkn_time,cls_tkn_time))
             card_id_lmt_sj,maxdate_limit_class_sj,lmt_sj_cls_remain=cursor.fetchone()
         except:
              card_id_lmt_sj=maxdate_limit_class_sj=lmt_sj_cls_remain=None
