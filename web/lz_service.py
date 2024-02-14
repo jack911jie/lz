@@ -1392,22 +1392,22 @@ class LzService(Flask):
         cursor=conn.cursor()
 
         # not_start_list
-        sql='''
-            select * from buy_rec_table 
-                where card_id in 
-                (SELECT card_id from not_start_lmt_table 
-                WHERE cus_id='{cus_id}' and cus_name='{cus_name}')
-            '''
-        cursor.execute(sql)
-        not_start_list=cursor.fetchall()
-        if not_start_list:
-            not_start_list=self.convert_mysql_data_to_string(not_start_list)
-            # buy_rec_cols=['id','cus_id','cus_name','buy_date','buy_code','buy_type','buy_num','buy_cls_days','pay','real_pay','cashier_name','income_type','comment']
-            buy_rec_cols=['index','cus_id','cus_name','收款日期','购课编码','购课类型','购课节数','购课时长（天）','应收金额','实收金额','收款人','收入类别','备注']
-            not_start_list=self.mysql_list_data_to_dic(data=not_start_list,mysql_cols=buy_rec_cols)  
-        else:
-            not_start_list={'0':{'index':'','cus_id':'','cus_name':'','收款日期':'','购课编码':'','购课类型':'','购课节数':'','购课时长（天）':'',
-                                            '应收金额':'','实收金额':'','收款人':'','收入类别':'','备注':''}}    
+        # sql='''
+        #     select * from buy_rec_table 
+        #         where card_id in 
+        #         (SELECT card_id from not_start_lmt_table 
+        #         WHERE cus_id='{cus_id}' and cus_name='{cus_name}')
+        #     '''
+        # cursor.execute(sql)
+        # not_start_list=cursor.fetchall()
+        # if not_start_list:
+        #     not_start_list=self.convert_mysql_data_to_string(not_start_list)
+        #     # buy_rec_cols=['id','cus_id','cus_name','buy_date','buy_code','buy_type','buy_num','buy_cls_days','pay','real_pay','cashier_name','income_type','comment']
+        #     buy_rec_cols=['index','cus_id','cus_name','收款日期','购课编码','购课类型','购课节数','购课时长（天）','应收金额','实收金额','收款人','收入类别','备注']
+        #     not_start_list=self.mysql_list_data_to_dic(data=not_start_list,mysql_cols=buy_rec_cols)  
+        # else:
+        #     not_start_list={'0':{'index':'','cus_id':'','cus_name':'','收款日期':'','购课编码':'','购课类型':'','购课节数':'','购课时长（天）':'',
+        #                                     '应收金额':'','实收金额':'','收款人':'','收入类别':'','备注':''}}    
 
         # buy_list
         sql=f"select * from buy_rec_table where cus_id='{cus_id}' and cus_name='{cus_name}'"
@@ -1423,16 +1423,16 @@ class LzService(Flask):
                                             '应收金额':'','实收金额':'','收款人':'','收入类别':'','备注':''}      
 
         # limit_cls_recs
-        sql=f"SELECT * FROM lmt_cls_rec_table where cus_id='{cus_id}' and cus_name='{cus_name}'"
-        cursor.execute(sql)
-        limit_cls_recs=cursor.fetchall()
-        if limit_cls_recs:
-            limit_cls_recs=self.convert_mysql_data_to_string(limit_cls_recs)
-            # limit_cls_recs_cols=['id','cus_id','cus_name','buy_code','start_date','end_date']
-            limit_cls_recs_cols=['id','cus_id','cus_name','购课编码','限时课程起始日','限时课程结束日']
-            limit_cls_recs=self.mysql_list_data_to_dic(data=limit_cls_recs,mysql_cols=limit_cls_recs_cols)  
-        else:
-            limit_cls_recs={'id':'','cus_id':'','cus_name':'','购课编码':'','限时课程起始日':'','限时课程结束日':''}      
+        # sql=f"SELECT * FROM lmt_cls_rec_table where cus_id='{cus_id}' and cus_name='{cus_name}'"
+        # cursor.execute(sql)
+        # limit_cls_recs=cursor.fetchall()
+        # if limit_cls_recs:
+        #     limit_cls_recs=self.convert_mysql_data_to_string(limit_cls_recs)
+        #     # limit_cls_recs_cols=['id','cus_id','cus_name','buy_code','start_date','end_date']
+        #     limit_cls_recs_cols=['id','cus_id','cus_name','购课编码','限时课程起始日','限时课程结束日']
+        #     limit_cls_recs=self.mysql_list_data_to_dic(data=limit_cls_recs,mysql_cols=limit_cls_recs_cols)  
+        # else:
+        #     limit_cls_recs={'id':'','cus_id':'','cus_name':'','购课编码':'','限时课程起始日':'','限时课程结束日':''}      
 
 
         # maxdate_limit_cls_rec ##old
@@ -1543,9 +1543,8 @@ class LzService(Flask):
         cursor.execute(sql,(cus_id,'long_prd','私教',cls_tkn_time))
         cards_id_cgsj=cursor.fetchall()     
 
-        return jsonify({'not_start_list':not_start_list,
-                        'buy_list':buy_list,
-                        'limit_cls_recs':limit_cls_recs,
+        return jsonify({'buy_list':buy_list,
+                        # 'limit_cls_recs':limit_cls_recs,
                         'maxdate_limit_class_sj':maxdate_limit_class_sj,
                         'limit_prd_card_id_sj':card_id_lmt_sj,
                         'maxdate_limit_class_grp':maxdate_limit_class_grp,
