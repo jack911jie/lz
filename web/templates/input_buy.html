@@ -15,7 +15,7 @@
         <ul id="cusNameResultList"></ul>
         <p></p>
 
-        <button onclick="get_cus_buy()">查看购课记录</button>
+        <button id='showHisBut' onclick="get_cus_buy()">查看购课记录</button>
         <div id="buyHistory" class="buy-list"></div>
 
         <h3>购课日期</h3>
@@ -104,17 +104,19 @@
             // const buyCodeBox=document.getElementById('buyCode');
             const historyDiv=document.getElementById('buyHistory');
 
-            //页面加载时，在页面上绑定点击时隐藏购课编码div的动作
-            // document.addEventListener("click",function(){
-            //     historyDiv.style.display='none';
-            // });
+            //面加载时，在页面上绑定点击时隐藏购课编码div的动作
+            document.addEventListener("click",function(){
+                historyDiv.style.display='none';
+            });
+
+            const showBuyHisButton=document.getElementById('showHisBut');
             
-            // buyCodeBox.addEventListener('click', function (event) {
-            // // 阻止事件冒泡，使得点击 input 不会触发 document 的点击事件
-            //     event.stopPropagation();
-            // // 显示 history 框
-            //     historyDiv.style.display = 'block';
-            // });
+            showBuyHisButton.addEventListener('click', function (event) {
+            // 阻止事件冒泡，使得点击 input 不会触发 document 的点击事件
+                event.stopPropagation();
+            // 显示 history 框
+                historyDiv.style.display = 'block';
+            });
 
 
             selectToday(id='dateInput',format='date');
