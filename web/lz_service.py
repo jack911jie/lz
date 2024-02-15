@@ -103,7 +103,8 @@ class LzService(Flask):
         self.add_url_rule('/get_cus_buy', view_func=self.get_cus_buy_db,methods=['GET','POST'])
         #获取既往体测记录
         self.add_url_rule('/get_body_history', view_func=self.get_body_history_db,methods=['GET','POST'])
-
+        #获取行业及职业
+        self.add_url_rule('/get_industry_occu', view_func=self.get_industry_occu,methods=['GET','POST'])
 
         #打开客户的xlsm文件
         self.add_url_rule('/open_cus_fn', view_func=self.open_cus_fn,methods=['GET','POST'])
@@ -154,6 +155,36 @@ class LzService(Flask):
         )
 
         return conn
+
+    def get_industry_occu(self):
+        conn=self.connect_mysql()
+        
+        try:
+            sql='''
+                select * from industry_table
+            '''
+            cursor=conn.cursor()
+            cursor.execute(sql)
+            industries=cursor.fetchall()
+        except:
+            pass
+        
+
+        try:
+            sql='''
+                select * from occu_table
+            '''
+            cursor=conn.cursor()
+            cursor.execute(sql)
+            occus=cursor.fetchall()
+        except:
+            pass
+    
+        cursor.close()
+        conn.close()
+
+        return jsonify({'industries':industries,'occus':occus})
+
 
     def show_who_ins(self):
         print('sending show who ins...')
@@ -2764,14 +2795,17 @@ class LzService(Flask):
                 data['nick_name']=data['cus_name'] if len(data['cus_name'])<2 else data['cus_name'][1:]
                 data['birthday_type']='ymd'
                 ins_ids=dataRequest['insIds']
+                data['industry_id']=dataRequest['industry_id']
+                data['occu_id']=dataRequest['occu_id']
                 # data['birthday_type']='ym'
                 # trial_cus_name=data['trial_cus_name']
                 cus_id_name=data['cus_id']+data['cus_name']
 
-                data_col=['cus_id','cus_name','nick_name','sex','mobile_phone','birthday','birthday_type','source']
+                data_col=['cus_id','cus_name','nick_name','sex','mobile_phone','birthday','birthday_type','industry_id','occu_id','source']
                 sorted_data={key: data[key].strip() for key in data_col}
                 values=tuple(sorted_data.values())
                 today=datetime.datetime.now().strftime('%Y-%m-%d')
+                # print(sorted_data)
 
                 #生成主管教练的姓名及教练ID
                 ins_name_arr=[]
@@ -2798,21 +2832,20 @@ class LzService(Flask):
                 # finally:
                 #     cursor.close()
                 #     conn.close()
-                
-                
+
                 try:
                     cursor=conn.cursor()
                     #新增会员
-                    sql=f'''
-                            insert into  cus_info_table (cus_id,cus_name,nick_name,sex,mobile_phone,birthday,birthday_type,source) 
+                    sql='''
+                            insert into  cus_info_table (cus_id,cus_name,nick_name,sex,mobile_phone,birthday,birthday_type,industry_id,occu_id,source) 
                             values
-                            (%s,%s,%s,%s,%s,%s,%s,%s)
+                            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                         '''
                     cursor.execute(sql,values)
 
 
                     #写入教练主管会员表
-                    sql=f'''
+                    sql='''
                             insert into ins_control_cus_table (cus_id,cus_name,ins_ids,ins_names) 
                             values
                             (%s,%s,%s,%s)

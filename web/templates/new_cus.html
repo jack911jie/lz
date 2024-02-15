@@ -34,6 +34,15 @@
         <h4>· 客户手机号 <input type="text" id="mobilePhone" style="width:120px;" oninput="checkMobileValid()"></h4>
         <span id="mobileValidResult" style="display:inline; color:rgb(221, 126, 123)"></span>
     </div>
+
+    <div>
+        <h4>· 客户行业  <select id="industrySelect"></select></h4>
+    </div>
+
+    <div>
+        <h4>· 客户职业  <select id="occuSelect"></select>  </h4>      
+    </div>
+
     <div>
         <h4>· 客户来源  <select id="cusSource"> 
             <option value="小红书">小红书</option>
@@ -65,6 +74,17 @@
         document.addEventListener('DOMContentLoaded',function(){
             loginCheck();
             selectToday();
+
+            fetch('./get_industry_occu')
+            .then(response=>response.json())
+            .then(data=>{
+                console.log(data);
+                generateIndOcc(ind_occ_data=data);
+            })
+            .catch(error=>{
+                console.log('获取体验课列表错误：',error);
+            })
+
             fetch('/get_trial_list')
             .then(response=>response.json())
             .then(data=>{
@@ -79,9 +99,6 @@
 
             fetch('/get_ins_list', {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -103,16 +120,51 @@
             insId=insInfo.sessionInsId;
             insName=insInfo.sessionInsName;
             insRole=insInfo.sessionInsRole;
-            console.log(insName)
+            // console.log(insName)
 
 
         });
+
+
+        function generateIndOcc(ind_occ_data){
+            const indSel=document.getElementById('industrySelect');
+            const occSel=document.getElementById('occuSelect');
+
+            const indData=ind_occ_data['industries'];
+            const occData=ind_occ_data['occus'];
+
+            indData.forEach(ind=>{
+                const indOpt=document.createElement('option');
+                indOpt.value=ind[0];
+                indOpt.text=ind[1];
+                indSel.appendChild(indOpt);
+            });
+
+            occData.forEach(occ=>{
+                const occOpt=document.createElement('option');
+                occOpt.value=occ[0];
+                occOpt.text=occ[1];
+                occSel.appendChild(occOpt);
+            });
+
+            indSel.addEventListener('change',function(){
+                //如果是学生，则职业不给选，强制为“学生”
+                if(indSel.value==='INT010'){
+                    occSel.value='OCC03';
+                    occSel.disabled=true;
+                }else{
+                    occSel.value='OCC01';
+                    occSel.disabled=false;
+                }        
+            });
+
+        }
 
         function generateInsCheckBoxes(insData){
             const insCheckBox=document.getElementById('insCheckBox');
             let firstCheck=true;
             insData.forEach(ins=>{ 
-                console.log(ins,insName)
+                // console.log(ins,insName)
                 const checkbox=document.createElement('input')
                 checkbox.type='checkbox';
                 checkbox.name='check-option';
@@ -362,6 +414,8 @@
             const cusSource=document.getElementById("cusSource").value.trim();
             const mobilePhone=document.getElementById("mobilePhone").value.trim();
             const insNamesChecked=document.querySelectorAll('input[name="check-option"]:checked');
+            const industry=document.getElementById("industrySelect").value;
+            const occu=document.getElementById("occuSelect").value;
 
             insIdsList=[]
             insNamesChecked.forEach(checkedName=>{
@@ -385,7 +439,9 @@
                     'birthDay':birthDay,
                     'cusSource':cusSource,
                     'dvc':dvc,
-                    'insIds':insIdsStr
+                    'insIds':insIdsStr,
+                    'industry_id':industry,
+                    'occu_id':occu
                 }
                 console.log(data)
                 fetch('/generate_new',{
