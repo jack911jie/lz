@@ -189,6 +189,7 @@
             buyNum.disabled=false;
             buyType.disabled=false;
             buyPay.disabled=false;
+            incomeType.disabled=false;
 
             realPay.value='';
             buyPay.value='';
@@ -643,6 +644,7 @@
         function handleInput() {
             hide_cus_buy();
             document.getElementById('buyCodeSelect').innerHTML='';
+            document.getElementById('incomeType').disabled=false;
             // 获取输入框中的值
             const searchTerm = document.getElementById("cusNameInput").value.trim();
             const UpperSearchTerm=searchTerm.toUpperCase();
