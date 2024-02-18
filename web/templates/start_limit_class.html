@@ -11,53 +11,58 @@
     <div>
         <h2>限时课程开课</h2>
         <hr>
-        <h4>客户姓名<span style="margin-left:10px;"></span><input id='cusNameInput' style="width:120px;" oninput="handleCusNameInput()"></h4>
+        <div class="form-row">
+            <h4 style="width:80px;">客户姓名</h4><input id='cusNameInput' style="width:120px;" oninput="handleCusNameInput()">
+        </div>
         <div id="cusList" class="cus-list-input-start-limit-class" style="display:none;"></div>
         <div id="currentClass"></div>
 
-        <div id="openInsBlock">
-        <h4>开课人
-        <select id="insSelect">
-            
+        <div id="openInsBlock" class="form-row">
+        <h4 style="width:80px;">开课人</h4>
+        <select id="insSelect">            
         </select>
-        </h4>
+        
         </div>
 
         <div id="cusNameBelowDivs" style="display:none;">
-            <div  id="startType" ><h4>开课方式
-            
+            <div  id="startType"  class="form-row">
+                <h4 style="width:80px;">开课方式</h4>
+                <h4 style="width:200px;margin-left:0px;">
                 <label for="startTypeRadio"></label>
                 <input type="radio" name="startTypeRadio" value="新课" onclick="getBuyCodeList()" checked>开启新课
                 <input type="radio" name="startTypeRadio" value="延长" onclick="getBuyCodeList()">延长旧课
                 </h4>
+                
             </div>
+            <hr>
         
             <div id="currentValidLmtCls"></div>
 
             <!-- <div id="buyHistoryPrompt"  style="display:none">选择相应的购课编码</div> -->
-            <div id="selectCardBlock"><h4>请选择关联卡号 <select id="selectBuyCodeContainer" style="display:none"> 
+            <div id="selectCardBlock" class="form-row">
+                <h4 style="width:120px;">请选择关联卡号 </h4>
+                <select id="selectBuyCodeContainer" style="display:none;margin:10px;"> 
                 <option value="">--请选择关联卡号--</option>
-            </select>
-            </h4>
+                </select>            
             </div>
             
-            <div id="clsLongBlock" style="display:none"><h4>购课时长：
+            <div id="clsLongBlock" style="display:none;margin:10px;"><h4>购课时长：
                 <span id="clsLong"></span> 天</h4>
             </div>
             
 
-            <div id='startDateBlock' style="display:none">
+            <div id='startDateBlock' style="display:none;margin:10px;">
                 <h4>开课日期<input id="startDate" type="date" > </h4>
             </div>          
 
-            <div id='endDateBlock' style="display:none"><h4>结束日期<input id="endDate" type="date" ></h4></div>
+            <div id='endDateBlock' style="display:none;margin:10px;"><h4>结束日期<input id="endDate" type="date" ></h4></div>
             <div id='endDatePrompt'></div>
             <!-- <div style="margin:10px;"></div> -->
             <br>
-            <div id="showDealResult" style="display:none">正在处理……</div>
+            <div id="showDealResult" style="display:none;margin:10px;">正在处理……</div>
             <div id="prompt"></div>
             <hr>
-            <button id="submit" onclick="submit()" style="display:none">开课</button>
+            <button id="submit" onclick="submit()" style="display:none;margin:10px;">开课</button>
         </div>
     </div>
 

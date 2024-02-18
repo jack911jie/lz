@@ -35,7 +35,7 @@
         <h3>上课的课程类型</h3>
         <select id="buyType" onchange="getValidClass()">
         </select>
-        <div id="cardId">关联卡号：<select id='cardIdStr'></select><span id="clsRemain"></span></div>
+        <div id="cardId" class="form-row" ><h4 style="margin-top:20px;margin-left:0px;">关联卡号：</h4><select id='cardIdStr'></select><span id="clsRemain"></span></div>
         
         <div id="validClassEndTime"></div>
         <div id="errBuyType" class="inline2"></div>
@@ -497,7 +497,7 @@
                                 // const classDate=new Date('2023-08-06')
                                 // console.log(classDate)
                                 const compareDate=new Date(classDate)-new Date(maxdate_limit_class_sj);
-                                validClassEndTime.innerText=`目前限时课程结束日：${dateToString(maxdate_limit_class_sj,'date')}`
+                                validClassEndTime.innerText=`本卡限时课程结束日：${dateToString(maxdate_limit_class_sj,'date')}`
                                 cardId.style.display='block';
                                 // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${limit_prd_card_id_sj}</span>`;
                                 const cardIdSel=document.getElementById('cardIdStr');
@@ -536,7 +536,7 @@
                                 // const classDate=new Date('2023-08-06')
                                 // console.log(classDate)
                                 const compareDate=new Date(classDate)-new Date(maxdate_limit_class_grp);
-                                validClassEndTime.innerText=`目前限时课程结束日：${dateToString(maxdate_limit_class_grp,'date')}`
+                                validClassEndTime.innerText=`本卡限时课程结束日：${dateToString(maxdate_limit_class_grp,'date')}`
                                 cardId.style.display='block';
                                 const cardIdSel=document.getElementById('cardIdStr');
                                 cardIdSel.innerText='';
@@ -658,7 +658,7 @@
                                 // const classDate=new Date('2023-08-06')
                                 // console.log(classDate)
                                 const compareDate=new Date(classDate)-new Date(maxdate_limit_class_rec[0]['限时课程结束日']);
-                                validClassEndTime.innerText=`目前限时课程结束日：${dateToString(maxdate_limit_class_rec[0]['限时课程结束日'],'date')}`
+                                validClassEndTime.innerText=`本卡限时课程结束日：${dateToString(maxdate_limit_class_rec[0]['限时课程结束日'],'date')}`
                                 console.log('对比选择日及最后生效课程结束日：',compareDate);
                                 allTrainContents.style.display='block';
                                 if(compareDate>0){

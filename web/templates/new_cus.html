@@ -10,53 +10,58 @@
     {% include 'show_ins_info.html' %}
     <h3>生成新的会员</h3>
     <hr>
-    <h4>· 输入新会员的姓名
-    <input type="text" id="cusName" style="width: 80px;" >   
-    </h4>
-    <h4 style="color:brown;">· 关联的体验课客户  <input id='trialCusNameInput' style="width:100px;" oninput="handletrialCusNameInput()" onclick="handletrialCusNameInput()"></h4>            
-    <div id="trialResultList"></div>    
-    <div id="insCheckBlock" ><h4>主管教练</h4> <div id="insCheckBox"></div></div> 
-    <div id="sex">
-        <h4>· 性别
-        <label>
-            <input type="radio"  name="gender" value="男">男
-        </label>
-        <label>
-            <input type="radio"  name="gender" value="女" checked>女
-        </label>
-        </h4>
+    <div class="form-row" >
+        <h4 style="color:brown;width:150px;" >· 关联的体验课客户 </h4>
+        <input id='trialCusNameInput' style="width:100px;" oninput="handletrialCusNameInput()" onclick="handletrialCusNameInput()">       
+        <div id="trialResultList"></div>    
     </div>
 
-    <div>
-        <h4>· 出生年月  <input id="dateInput" type="date" ></h4>       
+    <div  class="form-row" >
+        <h4 style="width:150px;">· 输入新会员的姓名</h4>
+        <input type="text" id="cusName" style="width: 100px;" >       
     </div>
-    <div>
-        <h4>· 客户手机号 <input type="text" id="mobilePhone" style="width:120px;" oninput="checkMobileValid()"></h4>
+
+    
+    <div id="insCheckBlock" class="form-row" ><h4>· 主管教练</h4> </div> 
+    <div id="insCheckBox" class="form-row" style="width:400px;margin-left:20px;" ></div>
+
+    <div id="sex" class="form-row" style="width:250px;margin-top:10px;">
+        <h4 style="width:100px;">· 客户性别</h4> 
+            <input type="radio"  name="gender" value="男" >男<span style="margin-right:30px;"></span>
+            
+            <input type="radio"  name="gender" value="女" checked>女    
+    </div>
+
+    <div class="form-row">
+        <h4><label for="dateInput" >· 出生年月</label></h4>     <input id="dateInput" type="date" style="width:120px;">    
+    </div>
+    <div class="form-row">
+        <h4><label for="mobilePhone" >· 客户手机号</label></h4> <input type="text" id="mobilePhone" style="width:120px;" oninput="checkMobileValid()">
         <span id="mobileValidResult" style="display:inline; color:rgb(221, 126, 123)"></span>
     </div>
 
-    <div>
-        <h4>· 客户行业  <select id="industrySelect"></select></h4>
+    <div class="form-row">
+        <h4><label for='industrySelect'>· 客户行业 </label></h4> <select id="industrySelect"></select>
     </div>
 
-    <div>
-        <h4>· 客户职业  <select id="occuSelect"></select>  </h4>      
+    <div class="form-row">
+        <h4>· 客户职业  </h4>   <select id="occuSelect"></select>     
     </div>
 
-    <div>
-        <h4>· 客户来源  <select id="cusSource"> 
+    <div class="form-row">
+        <h4>· 客户来源  </h4>     <select id="cusSource"> 
             <option value="小红书">小红书</option>
             <option value="转介绍">转介绍</option>
             <option value="自行到店">自行到店</option>
             <option value="其他媒体">其他媒体</option>
-        </select></h4>     
+        </select>
 
     </div>
-    <div>
-               <h4>· 体验客户有效期
-            <input type="radio" name="trailPeriod" value="all">全部
+    <div class="form-row">
+               <h4 style="width:150px;">· 体验客户有效期 </h4>
+            <input type="radio" name="trailPeriod" value="all">全部<span style="margin-right:30px;"></span>
             <input type="radio" name="trailPeriod" value="latest2" checked>近2个月
-        </h4>
+       
         
 
     </div>

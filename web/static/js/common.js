@@ -36,7 +36,9 @@ function hideInsSelectBlockAndGetInsInfo(id){
     if(id){
         const insSelectBlock=document.getElementById(id);
         if(sessionInsRole==='admin'){
-            insSelectBlock.style.display='block';
+            //关掉这句，才能保证form-row的css正确显示
+            // insSelectBlock.style.display='block';
+            insSelectBlock.classList.add('form-row');            
             showRole.innerText='管理员'
         }else if(sessionInsRole==='ins'){
             insSelectBlock.style.display='none';

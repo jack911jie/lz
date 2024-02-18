@@ -16,6 +16,7 @@
         <p></p>
 
         <button id='showHisBut' onclick="get_cus_buy()">查看购课记录</button>
+        <div id="noBuyHisPrompt"></div>
         <div id="buyHistory" class="buy-list"></div>
 
         <h3>购课日期</h3>
@@ -168,6 +169,7 @@
         
         function hide_cus_buy(){
             document.getElementById('buyHistory').style.display='none';
+            document.getElementById('noBuyHisPrompt').innerText='';
         }
 
         function get_cus_buy(){
@@ -200,7 +202,10 @@
             .then(jsonDataRes=>{
                 console.log('get cus buy history:',jsonDataRes)
                 const tableContainer = document.getElementById('buyHistory');
-                tableContainer.innerHTML=''
+                const noBuyHisPrompt=document.getElementById('noBuyHisPrompt');
+              
+                tableContainer.innerHTML='';
+                noBuyHisPrompt.innerHTML='';
                 const jsonData=jsonDataRes['buy_stat_list']
                 if(jsonData){
                     // 创建表格元素
@@ -221,6 +226,7 @@
                             const cell = row.insertCell();
                             cell.textContent = jsonData[i][j];                    
                         }
+                    
                         
                         // row.addEventListener('click', function(){
                         //     // 在点击时获取购课编码并打印
@@ -300,6 +306,7 @@
 
                         // 将表格添加到div中
                         tableContainer.appendChild(table);
+                        
                     }                   
                 }else{
                     // 如没有购课历史，则根据购课类型禁用或打开购课时长
@@ -307,6 +314,9 @@
                                     document.getElementById('buyDays').disabled=true;
                                 }else if(document.getElementById('buyType').value ==='限时私教课' ||document.getElementById('buyType').value ==='限时团课'){
                                     document.getElementById('buyDays').disabled=false;}
+                    noBuyHisPrompt.innerText='未查询到购课记录';
+
+       
                 }
                 
             })

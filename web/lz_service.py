@@ -2080,6 +2080,13 @@ class LzService(Flask):
         income_types=[x[0] for x in income_type_res]
         result['income_types']=income_types
 
+        #获取客户来源类型
+        sql='select source from cus_source_table'
+        cursor.execute(sql)
+        cus_source=cursor.fetchall()
+        result['cus_source']=cus_source
+
+
         # print(result)
         # 关闭游标和连接
         cursor.close()

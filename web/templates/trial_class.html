@@ -10,20 +10,42 @@
     {% include 'show_ins_info.html' %}
     <div >
         <h2>鹿鹿泽健身体验课记录</h2>
-        <h4>体验课上课时间 <input type="datetime-local" id="dateInput" style="width:150px;" ></h4>
-        <h4>客户姓名/昵称 <input type="text" id="cusNameInput" style="width:100px;" ></h4>
-        <div>
-            <h4>客户手机号 <input type="text" id="mobilePhone" style="width:120px;" oninput="checkMobileValid()"></h4>
+        <div class="form-row"><h4 style="width:120px;">体验课上课时间</h4> <input type="datetime-local" id="dateInput" style="width:150px;" ></div>
+        <div class="form-row"><h4 style="width:120px;">客户姓名/昵称 </h4><input type="text" id="cusNameInput" style="width:100px;" ></div>
+        <div class="form-row">
+            <h4 style="width:120px;">客户手机号</h4> <input type="text" id="mobilePhone" style="width:120px;" oninput="checkMobileValid()">
             <span id="mobileValidResult" style="display:inline; color:rgb(221, 126, 123)"></span>
         </div>
-        <div id="insSelectBlock"><h4>上课教练 <select id="insSelect"></select></h4></div>
-        <h4>客户来源 <select id="cusSource">
-            <option value="小红书">小红书</option>
-            <option value="转介绍">转介绍</option>
-            <option value="自行到店">自行到店</option>
-            <option value="其他媒体">其他媒体</option>
-        </select></h4>
-        <h4>备注 <input type='text' id='comment' style="height:30px;"></h4>   
+        
+        <div id="insSelectBlock" class="form-row">
+            <h4 style="width:120px;">上课教练 </h4>
+            <select id="insSelect"></select>
+        </div>
+        
+        <!-- <div id="" class="form-row">
+            <h4 style="width:120px;">上课教练 </h4>
+            <select id="">
+                <option value="转介绍">转介绍</option>
+                <option value="自行到店">自行到店</option>
+                <option value="其他媒体">其他媒体</option>
+            </select>
+        </div> -->
+
+        <div  class="form-row">
+            <h4 style="width:120px;">客户来源</h4> 
+            <select id="cusSource">
+                <!-- <option value="小红书">小红书</option>
+                <option value="转介绍">转介绍</option>
+                <option value="自行到店">自行到店</option>
+                <option value="其他媒体">其他媒体</option> -->
+            </select>
+        </div>
+
+        <div class="form-row">
+            <h4 style="width:120px;">备注</h4>  
+            <input type='text' id='comment' style="height:30px;">
+
+        </div> 
         
     </div>
     <hr>
@@ -56,22 +78,12 @@
                 .then(response => response.json())
                 .then(data => {
             //将data赋值给块变量cus_list，供后面的handleInput使用
-                tmplt_info=data;         
+                tmplt_info=data;    
+                generateCusSrc(data);    
                   })
                 .catch(error => console.error('Error:', error));
 
-            fetch('/get_cus_list', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-            //将data赋值给块变量cus_list，供后面的handleInput使用
-                cus_list=data
-                  })
-                .catch(error => console.error('Error:', error));
+            
 
             fetch('/get_ins_list', {
                 method: 'GET',
@@ -81,9 +93,11 @@
                 })
                 .then(response => response.json())
                 .then(insData => {
-            //将data赋值给块变量cus_list，供后面的handleInput使用
-                console.log(insData);
-                generateInsList(insData['ins_list'],'insSelect')
+                    console.log(insData);
+                    generateInsList(insData['ins_list'],'insSelect');
+                    const insSel=document.getElementById('insSelect');
+                    insSel.parentElement.classList.add('form-row');
+                    
                  })
                 .catch(error => console.error('Error:', error));
 
@@ -92,9 +106,32 @@
                 insName=insInfo.sessionInsName;
                 insRole=insInfo.sessionInsRole;
 
+                ensureFormRowAfterAsyncOperation();
+
+                // document.getElementById('insSelectBlock').classList.add('form-row');
+
+                console.log('dddd',document.getElementById('insSelectBlock').innerHTML)
+                console.log(document.getElementById('insSelectBlock').classList.contains('form-row'));
+
         });
 
+        function generateCusSrc(data){
+            const cusSrc=document.getElementById('cusSource');            
+            const srcs=data['cus_source']
+            srcs.forEach(src => {
+                const opt=document.createElement('option');
+                opt.value=src[0];
+                opt.text=src[0]
+                cusSrc.appendChild(opt);
+            });
+        }
         
+        function ensureFormRowAfterAsyncOperation() {
+            const insSelect = document.getElementById('insSelect');
+            if (insSelect && insSelect.parentElement) {
+                insSelect.parentElement.classList.add('form-row');
+            }
+        }
 
         function submit(){
 
