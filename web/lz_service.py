@@ -1548,11 +1548,11 @@ class LzService(Flask):
         # and card_name='私教'
         # and end_time>=%s
         # '''
-
+        #每人只能有一张常规私教卡，故min(cards_table.cls_qty)，不用sum，否则重复计算。
         sql='''
             SELECT 
                 filtered_a.card_id, max(cards_table.end_time) as end_time,
-                sum(cards_table.cls_qty) - IFNULL(b_count.times, 0) as remain_qty
+                min(cards_table.cls_qty) - IFNULL(b_count.times, 0) as remain_qty 
             FROM (
                 SELECT DISTINCT card_id 
                 FROM cards_table
@@ -1704,6 +1704,10 @@ class LzService(Flask):
         return f'写入成功, 行号：{row}, {aux_res}'
 
     def write_buy_db(self):
+        # 规则：
+        # 限时卡每人可以有多张
+        # 普通卡每人仅可以有一张，在前端通过get_cus_cards_by_type()查询已有卡号，
+        # get_cus_cards_by_type()中，如果已有卡号，则用旧卡号，否则生成新卡号返回前端。
         try:
             wk_dir=self.config_lz['work_dir']
             dat=request.json
@@ -2474,7 +2478,10 @@ class LzService(Flask):
         result['购课次数-限时私教课']=buy_count_lmt_sj
 
         #购课次数-常规私教课
-        sql=f"select count(buy_date) as buy_count from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规私教课'"
+        sql='''select count(buy_date) as buy_count from buy_rec_table 
+                WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规私教课'
+            '''
+            
         cursor.execute(sql)
         buy_count_cg_sj=cursor.fetchall()
         buy_count_cg_sj=buy_count_cg_sj[0][0]
@@ -2506,15 +2513,22 @@ class LzService(Flask):
         ###########################################
         #购课节数-常规私教课
         # sql=f"select sum(buy_num) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规私教课'"
-        sql='''
-        select sum(cls_qty) from cards_table 
-        WHERE card_id in  (select card_id from cardholder_card_table where cus_id=%s) 
-        and card_name='私教' 
-        and card_type='long_prd';
+        # sql='''
+        # select sum(cls_qty) from cards_table 
+        # WHERE card_id in  (select card_id from cardholder_card_table where cus_id=%s) 
+        # and card_name='私教' 
+        # and card_type='long_prd';
 
+        # '''
+
+        sql='''
+            select buy_flow_id,min(card_id) as card_id,min(buy_num) as cls_qty from buy_rec_table
+                where card_id in (select card_id from cardholder_card_table where cus_id=%s)
+                and buy_type=%s
+                group by buy_flow_id
         '''
-        cursor.execute(sql,cus_id)
-        buy_num_cg_sj=cursor.fetchone()[0]
+        cursor.execute(sql,(cus_id,'常规私教课'))
+        buy_num_cg_sj=cursor.fetchone()[2]
         # buy_num_cg_sj=buy_num_cg_sj[0]
         if not buy_num_cg_sj:
             buy_num_cg_sj=0
@@ -2619,7 +2633,7 @@ class LzService(Flask):
         cls_type=self.config_lz['cls_type_config'][buy_type]['type']        
         cls_name=self.config_lz['cls_type_config'][buy_type]['name']
 
-        print(cls_type,cls_name)
+        # print(cls_type,cls_name)
 
         conn=self.connect_mysql()
         cursor=conn.cursor()
