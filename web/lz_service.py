@@ -1216,20 +1216,19 @@ class LzService(Flask):
         conn=self.connect_mysql()
         cursor=conn.cursor()
         sql=f'''SELECT 
-                    card_id,
- 
-                    SUM(pay) AS 总应收金额,
+                    buy_flow_id, 
+                    avg(pay) AS 总应收金额,
                     SUM(real_pay) AS 总实收金额,
-                    MIN(buy_type) AS 购课类型,
+                    min(buy_type) AS 购课类型,
                     GROUP_CONCAT(DISTINCT DATE_FORMAT(buy_date, '%Y/%m/%d') ORDER BY buy_date ASC SEPARATOR '\n') AS 收款日期列表,
                     COUNT(*) AS 收款次数
                     
                 FROM
                     buy_rec_table
                 WHERE
-                    cus_name='{cus_name}' and cus_id='{cus_id}'
+                    cus_id='{cus_id}'
                 GROUP BY
-                    card_id;
+                    buy_flow_id;
         '''
         cursor.execute(sql)
         buy_stat=cursor.fetchall()
@@ -1449,10 +1448,10 @@ class LzService(Flask):
         if buy_list:
             buy_list=self.convert_mysql_data_to_string(buy_list)
             # buy_rec_cols=['id','cus_id','cus_name','buy_date','buy_code','buy_type','buy_num','buy_cls_days','pay','real_pay','cashier_name','income_type','comment']
-            buy_list_cols=['index','cus_id','cus_name','收款日期','购课编码','购课类型','购课节数','购课时长（天）','应收金额','实收金额','收款人','收入类别','备注']
+            buy_list_cols=['index','cus_id','cus_name','收款日期','购课编码','购课流水号','购课类型','购课节数','购课时长（天）','应收金额','实收金额','收款人','收入类别','备注']
             buy_list=self.mysql_list_data_to_dic(data=buy_list,mysql_cols=buy_list_cols)  
         else:
-            buy_list={'index':'','cus_id':'','cus_name':'','收款日期':'','购课编码':'','购课类型':'','购课节数':'','购课时长（天）':'',
+            buy_list={'index':'','cus_id':'','cus_name':'','收款日期':'','购课编码':'','购课流水号':'','购课类型':'','购课节数':'','购课时长（天）':'',
                                             '应收金额':'','实收金额':'','收款人':'','收入类别':'','备注':''}      
 
         # limit_cls_recs
@@ -1712,7 +1711,7 @@ class LzService(Flask):
             dat['cus_name']=dat['客户编码及姓名'][7:].strip()
             
             del dat['客户编码及姓名']
-            data_cols=['cus_id','cus_name','收款日期', '购课卡号','购课类型','购课节数', '购课时长（天）', '应收金额', '实收金额', '收款人', '收入类别', '备注','operatorId','operateTime']
+            data_cols=['cus_id','cus_name','收款日期', '购课卡号','购课流水号','购课类型','购课节数', '购课时长（天）', '应收金额', '实收金额', '收款人', '收入类别', '备注','operatorId','operateTime']
             sorted_data={key: dat[key] for key in data_cols}
             values=tuple(sorted_data.values())
 
@@ -1724,27 +1723,59 @@ class LzService(Flask):
             #写入购课表
             sql='''
                 insert into buy_rec_table
-                (cus_id,cus_name,buy_date,card_id,buy_type,buy_num,buy_cls_days,pay,real_pay,cashier_name,income_type,comment,operator_id,operate_time)
+                (cus_id,cus_name,buy_date,card_id,buy_flow_id,buy_type,buy_num,buy_cls_days,pay,real_pay,cashier_name,income_type,comment,operator_id,operate_time)
                 values
-                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             '''
             cursor.execute(sql,values)
             
-            #写入卡表
+            #写入卡表          
+            if dat['购课类型']=='限时私教课' or dat['购课类型']=='限时团课':
+                #查询表中是否已有购课流水，如有，说明为补交余款，获取原来相应的起始和终止日
+                sql='''select distinct card_start_time, end_time from cards_table 
+                    where card_id in 
+                        (select card_id from buy_rec_table where buy_flow_id=%s)
+                    and card_start_time is not null
+                    and end_time is not null
+                '''
+                try:
+                    cursor.execute(sql,sorted_data['购课流水号'])
+                    existed_flow_id=cursor.fetchall()
+                    if(existed_flow_id):
+                        s_time,end_time=existed_flow_id[0]
+                    else:
+                        s_time=None
+                        end_time=None
+                except:
+                    pass
+
+                
+            elif dat['购课类型']=='常规私教课' or dat['购课类型']=='常规团课':
+                #查询表中是否已有购课流水，如有，说明为补交余款，获取原来相应的起始和终止日
+                sql='''select distinct card_start_time, end_time from cards_table 
+                    where card_id in 
+                        (select card_id from buy_rec_table where buy_flow_id=%s)
+                    and card_start_time is not null
+                    and end_time is not null
+                '''
+                try:
+                    cursor.execute(sql,sorted_data['购课流水号'])
+                    existed_flow_id=cursor.fetchall()
+                    if(existed_flow_id):
+                        s_time,end_time=existed_flow_id[0]
+                    else:
+                        s_time=dat['收款日期']
+                        e_time=datetime.datetime.strptime(s_time,'%Y-%m-%d')+datetime.timedelta(days=int(dat['购课时长（天）']))
+                        end_time=e_time.strftime('%Y-%m-%d')
+                except:
+                    pass
+            
             sql='''
                 insert into cards_table
                 (card_id,card_type,card_name,cls_qty,card_start_time,prd,end_time,cmt,opr_id,opr_time)
                 values
                 (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             '''
-
-            if dat['购课类型']=='限时私教课' or dat['购课类型']=='限时团课':
-                s_time=None
-                end_time=None
-            elif dat['购课类型']=='常规私教课' or dat['购课类型']=='常规团课':
-                s_time=dat['收款日期']
-                e_time=datetime.datetime.strptime(s_time,'%Y-%m-%d')+datetime.timedelta(days=int(dat['购课时长（天）']))
-                end_time=e_time.strftime('%Y-%m-%d')
 
             values=(dat['购课卡号'],self.config_lz['cls_type_config'][dat['购课类型']]['type'],
                         self.config_lz['cls_type_config'][dat['购课类型']]['name'],dat['购课节数'],

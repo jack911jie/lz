@@ -98,7 +98,10 @@
         let buy_list;
         let insRole;
         let insName;
-        const allError={'dateError':0,'buyNumError':0};
+        let buyFlowId='';
+        let startDate;
+        let endDate;
+        let allError={'dateError':0,'buyNumError':0};
         // 使用DOMContentLoaded事件监听，在页面加载完成后触发获取数据的操作
         document.addEventListener("DOMContentLoaded", function() {   
             loginCheck();
@@ -180,6 +183,7 @@
             const buyPay=document.getElementById('pay');   
             const errBuyType=document.getElementById('errBuyType');
             const realPay=document.getElementById('realPay');
+            const incomeType=document.getElementById('incomeType');
             
             buyDays.disabled=false;
             buyNum.disabled=false;
@@ -241,6 +245,7 @@
                             // 阻止事件冒泡，使得点击 history 不会触发 document 的点击事件
                                 event.stopPropagation();
                                 const buyCodeErrBox=document.getElementById('buyCodeErr');
+                                incomeType.disabled=false;
                                 buyCodeErrBox.innerText='';
                                 realPay.value='';
                                 buyNum.value='';
@@ -264,19 +269,20 @@
                                 document.getElementById('buyCodeSelect').innerHTML='';
                                 const cardIdOpt=document.createElement('option');
                                 cardIdOpt.value=buyCode;
-                                cardIdOpt.text=buyCode;
+                                cardIdOpt.text=buyCode.split('-')[0];
                                 document.getElementById('buyCodeSelect').appendChild(cardIdOpt);
                                 
                                 // if()
                                 
                                 const buyRecords=Object.keys(buy_list).map(key => (buy_list[key]));
-                                console.log(buyRecords);
+                                // console.log(buyRecords);
                                 buyRecords.forEach(buyRec=> {
-                                    if(buyRec['购课编码']===buyCode){
+                                    if(buyRec['购课流水号']===buyCode){
                                         document.getElementById('buyType').value=buyRec['购课类型'];
                                         document.getElementById('buyNum').value=buyRec['购课节数'];
                                         document.getElementById('buyDays').value=buyRec['购课时长（天）'];
                                         document.getElementById('pay').value=buyRec['应收金额'];
+                                        document.getElementById('incomeType').value=buyRec['收入类别'];
                                         if(parseFloat(notPayAmount)>0){
                                             realPay.value=notPayAmount;
                                         }
@@ -288,6 +294,7 @@
                                 buyNum.disabled=true;
                                 buyType.disabled=true;
                                 buyPay.disabled=true;
+                                incomeType.disabled=true;
                                 errBuyType.innerText=''
 
 
@@ -488,7 +495,9 @@
                         n+=1;
                     });   
                     // data加入选择的内容           
-                    data['购课卡号']=document.getElementById('buyCodeSelect').value;
+                    // data['购课卡号']=document.getElementById('buyCodeSelect').value.split('-')[0];
+                    data['购课流水号']=document.getElementById('buyCodeSelect').value;
+                    data['购课卡号']=data['购课流水号'].split('-')[0];
                     data['购课类型']=document.getElementById('buyType').value;
                     data['收款人']=document.getElementById('cashier').value;
                     data['收入类别']=document.getElementById('incomeType').value;
@@ -588,6 +597,8 @@
         }
 
         function generateBuyCodeSelect(){
+            const currentTime=dateFormat(new Date(),'date_time_14_digits');
+            console.log(currentTime)
             const cusIdName=document.getElementById('cusNameInput').value;
             const buyType=document.getElementById('buyType').value;
             const buyDate=document.getElementById('dateInput').value.trim();
@@ -611,7 +622,7 @@
                                         buyCodeSel.innerText='';
                                         data['card_ids'].forEach(card=>{
                                             const opt=document.createElement('option');
-                                            opt.value=card;
+                                            opt.value=card+'-'+currentTime;
                                             opt.text=card;
                                             buyCodeSel.appendChild(opt);
 

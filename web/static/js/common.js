@@ -156,6 +156,10 @@ function selectDate(dateInput,id,format){
 }
 
 function dateFormat(currentDate,fmt){
+    function pad(number) {
+        return number < 10 ? '0' + number : number;
+      }
+
     let formattedDate;
     if(fmt==='date'){
         var year = currentDate.getFullYear();
@@ -168,6 +172,15 @@ function dateFormat(currentDate,fmt){
         const seconds = currentDate.getSeconds();
         // const formattedDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
         formattedDate = `${hours}:${minutes}:${seconds}`;
+    }else if(fmt==='date_time_14_digits'){
+        const year = currentDate.getFullYear();
+        const month = pad(currentDate.getMonth() + 1); // 月份是从0开始的
+        const day = pad(currentDate.getDate());
+        const hours = pad(currentDate.getHours());
+        const minutes = pad(currentDate.getMinutes());
+        const seconds = pad(currentDate.getSeconds());
+
+        formattedDate= year + month + day + hours + minutes + seconds;
     }
     
     // 拼接日期字符串，例如：YYYY-MM-
