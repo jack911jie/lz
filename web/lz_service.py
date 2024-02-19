@@ -2528,9 +2528,13 @@ class LzService(Flask):
                 group by buy_flow_id
         '''
         cursor.execute(sql,(cus_id,'常规私教课'))
-        buy_num_cg_sj=cursor.fetchone()[2]
-        # buy_num_cg_sj=buy_num_cg_sj[0]
-        if not buy_num_cg_sj:
+        try:
+            buy_num_cg_sj=cursor.fetchone()[2]
+            # buy_num_cg_sj=buy_num_cg_sj[0]
+            if not buy_num_cg_sj:
+                buy_num_cg_sj=0
+        except:
+            print('buy num cj sj is null, set 0')
             buy_num_cg_sj=0
 
         result['购课节数-常规私教课']=float(buy_num_cg_sj)
