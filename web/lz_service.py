@@ -1552,28 +1552,40 @@ class LzService(Flask):
         sql='''
             SELECT 
                 filtered_a.card_id, max(cards_table.end_time) as end_time,
-                min(cards_table.cls_qty) - IFNULL(b_count.times, 0) as remain_qty 
+                max(buyrecfilter.cgsj_qty) -  IFNULL(b_count.times, 0) as remain_qty 
             FROM (
-                SELECT DISTINCT card_id 
-                FROM cards_table
-                WHERE card_id IN (
-                    SELECT card_id
-                    FROM cardholder_card_table
-                    WHERE cus_id=%s
-                )
-                AND card_type=%s
-                AND card_name=%s
-                AND end_time>=%s
-            ) AS filtered_a
+                    SELECT DISTINCT card_id 
+                    FROM cards_table
+                    WHERE card_id IN (
+                        SELECT card_id
+                        FROM cardholder_card_table
+                        WHERE cus_id=%s
+                    )
+            AND card_type=%s
+            AND card_name=%s
+            AND end_time>=%s
+                ) AS filtered_a
+
             LEFT JOIN (
-                SELECT card_id, COUNT(card_id) as times
-                FROM cls_tkn_rec_table
-                GROUP BY card_id
-            ) AS b_count ON filtered_a.card_id = b_count.card_id 
+                    SELECT card_id, COUNT(card_id) as times
+                    FROM cls_tkn_rec_table
+                    GROUP BY card_id
+            ) AS b_count ON filtered_a.card_id = b_count.card_id             
+            
             LEFT JOIN cards_table ON filtered_a.card_id = cards_table.card_id
+            
+            LEFT JOIN (
+                SELECT card_id,sum(buytablefilter.cls_qty) AS cgsj_qty 
+                    FROM (SELECT buy_flow_id,min(card_id) AS card_id,min(buy_num) AS cls_qty FROM buy_rec_table
+                            WHERE card_id in 
+                                (SELECT card_id from cardholder_card_table WHERE cus_id=%s)
+                            AND buy_type=%s
+                            GROUP BY card_id,buy_flow_id) AS buytablefilter
+                GROUP BY card_id
+                ) AS buyrecfilter ON filtered_a.card_id=buyrecfilter.card_id   
             GROUP BY filtered_a.card_id
         '''
-        cursor.execute(sql,(cus_id,'long_prd','私教',cls_tkn_time))
+        cursor.execute(sql,(cus_id,'long_prd','私教',cls_tkn_time,cus_id,'常规私教课'))
         cards_id_cgsj=cursor.fetchall()     
 
         return jsonify({'buy_list':buy_list,
@@ -2522,14 +2534,18 @@ class LzService(Flask):
         # '''
 
         sql='''
-            select buy_flow_id,min(card_id) as card_id,min(buy_num) as cls_qty from buy_rec_table
-                where card_id in (select card_id from cardholder_card_table where cus_id=%s)
-                and buy_type=%s
-                group by buy_flow_id
+            select card_id,sum(cls_qty) as cls_qty from
+                (select buy_flow_id,min(card_id) as card_id,min(buy_num) as cls_qty from buy_rec_table
+                    where card_id in 
+                        (select card_id from cardholder_card_table where cus_id=%s)
+                        and buy_type=%s
+                    group by buy_flow_id) 
+                as subq
+            group by card_id;
         '''
         cursor.execute(sql,(cus_id,'常规私教课'))
         try:
-            buy_num_cg_sj=cursor.fetchone()[2]
+            buy_num_cg_sj=cursor.fetchone()[1]
             # buy_num_cg_sj=buy_num_cg_sj[0]
             if not buy_num_cg_sj:
                 buy_num_cg_sj=0
