@@ -1729,22 +1729,14 @@ class LzService(Flask):
             del dat['客户编码及姓名']
             data_cols=['cus_id','cus_name','收款日期', '购课卡号','购课流水号','购课类型','购课节数', '购课时长（天）', '应收金额', '实收金额', '收款人', '收入类别', '备注','operatorId','operateTime']
             sorted_data={key: dat[key] for key in data_cols}
-            values=tuple(sorted_data.values())
+            values_buy_table=tuple(sorted_data.values())
 
             conn=self.connect_mysql()
             cursor=conn.cursor()
             
             conn.begin()
 
-            #写入购课表
-            sql='''
-                insert into buy_rec_table
-                (cus_id,cus_name,buy_date,card_id,buy_flow_id,buy_type,buy_num,buy_cls_days,pay,real_pay,cashier_name,income_type,comment,operator_id,operate_time)
-                values
-                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            '''
-            cursor.execute(sql,values)
-            
+
             #写入卡表          
             if dat['购课类型']=='限时私教课' or dat['购课类型']=='限时团课':
                 #查询表中是否已有购课流水，如有，说明为补交余款，获取原来相应的起始和终止日
@@ -1777,9 +1769,12 @@ class LzService(Flask):
                 try:
                     cursor.execute(sql,sorted_data['购课流水号'])
                     existed_flow_id=cursor.fetchall()
+                    print('existed_flow_id: ',existed_flow_id,'\ninput_flow_id:',sorted_data['购课流水号'])
                     if(existed_flow_id):
+                        print('1111')
                         s_time,end_time=existed_flow_id[0]
                     else:
+                        print('2222')
                         s_time=dat['收款日期']
                         e_time=datetime.datetime.strptime(s_time,'%Y-%m-%d')+datetime.timedelta(days=int(dat['购课时长（天）']))
                         end_time=e_time.strftime('%Y-%m-%d')
@@ -1793,10 +1788,21 @@ class LzService(Flask):
                 (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             '''
 
-            values=(dat['购课卡号'],self.config_lz['cls_type_config'][dat['购课类型']]['type'],
+            values_cards_table=(dat['购课卡号'],self.config_lz['cls_type_config'][dat['购课类型']]['type'],
                         self.config_lz['cls_type_config'][dat['购课类型']]['name'],dat['购课节数'],
                         s_time,dat['购课时长（天）'],end_time,dat['备注'],dat['operatorId'],dat['operateTime'])
-            cursor.execute(sql,values)
+            cursor.execute(sql,values_cards_table)
+
+            #写入购课表
+            sql='''
+                insert into buy_rec_table
+                (cus_id,cus_name,buy_date,card_id,buy_flow_id,buy_type,buy_num,buy_cls_days,pay,real_pay,cashier_name,income_type,comment,operator_id,operate_time)
+                values
+                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            '''
+            cursor.execute(sql,values_buy_table)
+            
+            
 
             #写入持卡人-卡表
             sql='''
@@ -1814,14 +1820,14 @@ class LzService(Flask):
                 pass
             else:
                 try:
-                    values=(dat['cus_id'],dat['购课卡号'],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'')
+                    values_holder_card_table=(dat['cus_id'],dat['购课卡号'],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'')
                     sql='''
                         insert into cardholder_card_table 
                         (cus_id,card_id,relation_time,cmt)
                         values
                         (%s,%s,%s,%s)
                     '''
-                    cursor.execute(sql,values)
+                    cursor.execute(sql,values_holder_card_table)
                 except:
                     print('insert into cardholder_card_table error')
                     raise FERROR 

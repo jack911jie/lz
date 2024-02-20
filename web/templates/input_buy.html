@@ -412,18 +412,28 @@
             const allInputBox=document.getElementById('inputContents');
             const inputElements=allInputBox.querySelectorAll('input');
             const selectElements=allInputBox.querySelectorAll('select');
+            const dicIdEmp={
+                'cusNameInput':'客户姓名',
+                'buyCodeSelect':'购课编码',
+                'buyNum':'购课节数',
+                'buyDays':'购课天数',
+                'pay':'应收金额',
+                'realPay':'实收金额',
+                'cashier':'收款人姓名',
+                'incomeType':'收入类型'
+            }
             try{
                 inputElements.forEach((input)=>{              
                     console.log(input.value);
-                    // if(document.getElementById('buyType').value==='限时私教课'){
-                    //     if(input.id!=='comment' && !input.value){
-                    //     throw new Error('输入项 '+input.id+' 有空值或未选择');                        
-                    //     }
-                    // }else{
-                    //     if(input.id!=='comment' && input.id!=='buyDays' && !input.value){
-                    //     throw new Error('输入项 '+input.id+' 有空值或未选择'); 
-                    //     }
-                    // }
+                    if(document.getElementById('buyType').value==='限时私教课' || document.getElementById('buyType').value==='限时团课'){
+                        if(input.id!=='comment' && !input.value){
+                        throw new Error('输入项 '+dicIdEmp[input.id]+' 有空值或未选择');                        
+                        }
+                    }else{
+                        if(input.id!=='comment' && input.id!=='buyDays' && !input.value){
+                        throw new Error('输入项 '+dicIdEmp[input.id]+' 有空值或未选择'); 
+                        }
+                    }
                     
                     // const buyCodePattern=/^MH\d{5}.*\d{8}$/
                     // if(!buyCodePattern.test(document.getElementById('buyCode').value)){
@@ -434,15 +444,16 @@
                         || document.getElementById('pay').value==='0' || document.getElementById('realPay').value==='0'
                         ){
                         throw new Error('不能有0值');
-                    }                   
-                    // if(document.getElementById('buyType').value==='限时私教课'){
-                    //     if(
-                    //         document.getElementById('buyDays').value==='' || document.getElementById('buyNum').value===''
-                    //         || document.getElementById('buyDays').value===0 || document.getElementById('buyNum').value===0
-                    //     ){
-                    //         throw new Error('限时课程必须同时输入购课节数及购课时长（天）');
-                    //     }
-                    // }         
+                    }      
+
+                    if(document.getElementById('buyType').value==='限时私教课' || document.getElementById('buyType').value==='限时团课'){
+                        if(
+                            document.getElementById('buyDays').value==='' || document.getElementById('buyNum').value===''
+                            || document.getElementById('buyDays').value===0 || document.getElementById('buyNum').value===0
+                        ){
+                            throw new Error('限时课程必须同时输入 购课节数 及 购课时长（天）');
+                        }
+                    }         
                     if(parseInt(document.getElementById('buyNum').value)<0){
                         throw new Error('购课节数必须为正数')
                     }          
@@ -456,22 +467,22 @@
                         throw new Error('实收金额必须为正数')
                     }   
                 });
+
                 selectElements.forEach((select)=>{
-                    console.log(select.value);
-                    
-                  
+                    // console.log(select.value);
                     if(!select.value){
-                        throw new Error('选择项 '+select.id+' 未选择');
+                        throw new Error('选择项 '+dicIdEmp[select.id]+' 未选择');
                     }
                 });
-                if(document.getElementById('buyCodeSelect').value==='限时私教课'){
-                        if(
-                            document.getElementById('buyDays').value==='' || document.getElementById('buyNum').value===''
-                            || document.getElementById('buyDays').value===0 || document.getElementById('buyNum').value===0
-                        ){
-                            throw new Error('限时课程必须同时输入购课节数及购课时长（天）');
-                        }
-                } 
+
+                // if(document.getElementById('buyCodeSelect').value==='限时私教课'){
+                //         if(
+                //             document.getElementById('buyDays').value==='' || document.getElementById('buyNum').value===''
+                //             || document.getElementById('buyDays').value===0 || document.getElementById('buyNum').value===0
+                //         ){
+                //             throw new Error('限时课程必须同时输入 购课节数 及 购课时长（天）');
+                //         }
+                // } 
                 return 'True';
             }catch(error){
                 // alert('字段 '+error+' 有空格/未选择');
@@ -513,6 +524,8 @@
                     //改写页面的状态提示
                     document.getElementById('status').innerText='正在写入'
 
+                    console.log(data)
+
                     fetch('/write_buy',{
                         method:"POST",
                         headers:{
@@ -522,7 +535,7 @@
                     })
                     .then(response=>response.json())
                     .then(data=>{
-                        console.log(data)
+                        // console.log(data)
                         if(data.res==='ok'){
                             alert('购课记录增加成功')
                             window.location.href='./index';
