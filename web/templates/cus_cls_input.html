@@ -184,10 +184,10 @@
                     </div>   
                 
                 <div id="oxy-0" style="display: none;" class="oxy">
-                    <h4>有氧训练</h4>
+                    <h4>有氧/其他训练</h4>
                     <input id="oxyName-0" oninput="handleOxyNameInput(this)" onclick="handleOxyNameInput(this)" style="font-size:18px;color:rgb(26, 122, 58);">
                     <div id="oxyTrainList-0" class="train-list4" style="display:none"></div>
-                        <h4>有氧时间 
+                        <h4>有氧/其他训练时间 
                         <input id="oxyTime-0" style="width: 50px;" type="number" min="0"> 分</h4>
 
                     <h4>组数<span style="width:10px;"></span>
@@ -829,7 +829,7 @@
                 trainItem['oxyTime']=document.getElementById('oxyTime-'+id_num).value;
                 trainItem['oxyGroup']=document.getElementById('oxyGroup-'+id_num).value;
 
-                if(trainType==="有氧训练"){
+                if(trainType==="有氧/其他训练"){
                     trainItem['nonOxyName']="";
                     trainItem['nonOxyWt']="";
                     trainItem['nonOxyDis']="";
@@ -1043,7 +1043,7 @@
 
             // 将值初始化
             document.getElementById('selectTrainForm'+'-'+(blockOrder-1)).selectedIndex=0;
-            document.getElementById('radioContainer'+'-'+(blockOrder-1)).value='有氧训练';
+            document.getElementById('radioContainer'+'-'+(blockOrder-1)).value='有氧/其他训练';
             document.getElementById('nonOxyName'+'-'+(blockOrder-1)).value='';
             document.getElementById('oxyName'+'-'+(blockOrder-1)).value='';
         }
@@ -1096,12 +1096,12 @@
                 trainList=Object.keys(train_list.by_category);
             }
 
-            // 将有氧训练排队在第一位
-            let indexOfOxy = trainList.indexOf("有氧训练");
-            // 将元素 "有氧训练" 插入到数组的开头
+            // 将有氧/其他训练排队在第一位
+            let indexOfOxy = trainList.indexOf("有氧/其他训练");
+            // 将元素 "有氧/其他训练" 插入到数组的开头
             if (indexOfOxy !== -1) {
-                trainList.splice(indexOfOxy, 1); // 先将 "有氧训练" 从原来位置移除
-                trainList.unshift("有氧训练"); // 再将 "有氧训练" 插入到数组的开头
+                trainList.splice(indexOfOxy, 1); // 先将 "有氧/其他训练" 从原来位置移除
+                trainList.unshift("有氧/其他训练"); // 再将 "有氧/其他训练" 插入到数组的开头
             }
 
             let firstRadio=true;
@@ -1126,9 +1126,9 @@
                 const label = document.createElement("label");
                 label.textContent = option;
 
-                if(option==='有氧训练'){
+                if(option==='有氧/其他训练'){
                     label.style.color='#1e4129';
-                    const br = document.createElement("br"); // 创建一个 <br> 元素,在有氧训练后换行
+                    const br = document.createElement("br"); // 创建一个 <br> 元素,在有氧/其他训练后换行
                     label.appendChild(br); // 将 <br> 元素添加到 label 中 
                 }else{
                     label.style.color='#752320';
@@ -1144,7 +1144,7 @@
         function generateTrainItem(dd){
             const radioValue=dd.value;
             // console.log(radioValue)
-            if(radioValue==="有氧训练"){
+            if(radioValue==="有氧/其他训练"){
                 dd.parentNode.parentNode.nextElementSibling.style.display='none';
                 dd.parentNode.parentNode.nextElementSibling.nextElementSibling.style.display='block';
             }else{
@@ -1390,16 +1390,16 @@
                     emptyItem=emptyItem+'，'+`第${num}条：训练项目名称`;
                 }
 
-                // 有氧训练必须有时间
+                // 有氧/其他训练必须有时间
                 if(cls_recs['train_rec']['train_recs'][key]['oxyName']!=='' && cls_recs['train_rec']['train_recs'][key]['oxyTime']==='' ){
                     checkValueEmpty+=1;
-                    emptyItem=emptyItem+'，'+`第${num}条：有氧训练时间`;
+                    emptyItem=emptyItem+'，'+`第${num}条：有氧/其他训练时间`;
                 }
 
-                //有氧训练时间必须为正数
+                //有氧/其他训练时间必须为正数
                 if(cls_recs['train_rec']['train_recs'][key]['oxyName']!=='' && parseInt(cls_recs['train_rec']['train_recs'][key]['oxyTime'])<0){
                     checkValueEmpty+=1;
-                    emptyItem=emptyItem+'，'+`第${num}条：有氧训练时间为负数`;
+                    emptyItem=emptyItem+'，'+`第${num}条：有氧/其他训练时间为负数`;
                 }
 
                 //抗阻训练距离必须为正数
