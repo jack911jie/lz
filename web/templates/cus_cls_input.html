@@ -489,7 +489,7 @@
                     const clsType=document.getElementById('buyType').value;
                     const cardIdSel=document.getElementById('cardIdStr');
                     
-                    if (clsType==='限时私教课'){
+                    if (clsType==='限时课程'){
                         if(maxdate_limit_class_sj){
                             if(maxdate_limit_class_sj!==''){
                                 //获取的datetime有时间2023-08-06T14:32，只需前面的日期，否则会引起上课日期和结束日是同一天时，不算入有效期内。
@@ -513,7 +513,7 @@
                                     validClassEndTime.textContent='';
                                     cardId.style.display='none';
                                     errBuyType.textContent='无有效的限时课程';
-                                    // alert('无有效的限时私教课')
+                                    // alert('无有效的限时课程')
                                 }
                                 //监听select
                                 showClsRemain([[limit_prd_card_id_sj,maxdate_limit_class_sj,lmt_sj_cls_remain]]);
@@ -523,7 +523,7 @@
                             validClassEndTime.textContent='';
                             cardId.style.display='none';
                             errBuyType.textContent='无有效的限时课程';
-                            // alert('无有效的限时私教课')
+                            // alert('无有效的限时课程')
                         }
                         //手动触发select
                         const event=new Event('change');
@@ -552,7 +552,7 @@
                                     validClassEndTime.textContent='';
                                     cardId.style.display='none';
                                     errBuyType.textContent='无有效的限时课程';
-                                    // alert('无有效的限时私教课')
+                                    // alert('无有效的限时课程')
                                 }
                             }
                         }else{
@@ -560,11 +560,11 @@
                             validClassEndTime.textContent='';
                             cardId.style.display='none';
                             errBuyType.textContent='无有效的限时课程';
-                            // alert('无有效的限时私教课')
+                            // alert('无有效的限时课程')
                         }
-                    }else if(clsType==='常规私教课' ){
+                    }else if(clsType==='常规课程' ){
                         
-                        const normalClassRemain=classAndBodyHistory['剩余节数-常规私教课'];      
+                        const normalClassRemain=classAndBodyHistory['剩余节数-常规课程'];      
                         if(normalClassRemain && normalClassRemain>0){
                             errBuyType.textContent='';
                             allTrainContents.style.display='block';
@@ -585,7 +585,7 @@
                                 showClsRemain(long_prd_sj_card_ids);
                             });                            
                         }else{
-                            errBuyType.textContent='无常规私教课';
+                            errBuyType.textContent='无常规课程';
                             allTrainContents.style.display='none';
                             cardId.style.display='none';
                         }
@@ -650,7 +650,7 @@
                     maxdate_limit_class_rec=data['maxdate_limit_class_rec'];
                     const clsType=document.getElementById('buyType').value;
                     
-                    if (clsType==='限时私教课' || clsType==='限时团课'){
+                    if (clsType==='限时课程' || clsType==='限时团课'){
                         if(maxdate_limit_class_rec[0]['限时课程结束日']){
                             if(maxdate_limit_class_rec[0]['限时课程结束日']!==''){
                                 //获取的datetime有时间2023-08-06T14:32，只需前面的日期，否则会引起上课日期和结束日是同一天时，不算入有效期内。
@@ -665,22 +665,22 @@
                                     allTrainContents.style.display='none';
                                     validClassEndTime.textContent='';
                                     errBuyType.textContent='无有效的限时课程';
-                                    // alert('无有效的限时私教课')
+                                    // alert('无有效的限时课程')
                                 }
                             }
                         }else{
                             allTrainContents.style.display='none';
                             validClassEndTime.textContent='';
                             errBuyType.textContent='无有效的限时课程';
-                            // alert('无有效的限时私教课')
+                            // alert('无有效的限时课程')
                         }
-                    }else if(clsType==='常规私教课' ){
-                        const normalClassRemain=classAndBodyHistory['剩余节数-常规私教课'];                        
+                    }else if(clsType==='常规课程' ){
+                        const normalClassRemain=classAndBodyHistory['剩余节数-常规课程'];                        
                         if(normalClassRemain && normalClassRemain>0){
                             errBuyType.textContent='';
                             allTrainContents.style.display='block';
                         }else{
-                            errBuyType.textContent='无常规私教课';
+                            errBuyType.textContent='无常规课程';
                             allTrainContents.style.display='none';
                         }
                         
@@ -728,7 +728,7 @@
             classTakenInfo.innerHTML=''
             console.log('reported by Name:',cusName);
             console.log('data:',data)
-            const total_cls_tkn_qty=data['上课次数-常规私教课']+data['上课次数-限时私教课']+data['上课次数-限时团课']+data['上课次数-常规团课']
+            const total_cls_tkn_qty=data['上课次数-常规课程']+data['上课次数-限时课程']+data['上课次数-限时团课']+data['上课次数-常规团课']
             
             
             try{
@@ -760,13 +760,13 @@
                             <p><span>· 最近一次限时课程到期日：</span>${dateFormat(new Date(data['限时课程到期日']),'date')?dateFormat(new Date(data['限时课程到期日']),'date'):'-'}</p>
                             </div>
                             <div >
-                            <p><span style="display: inline;">· 常规私教课剩余节数：</span>${data['剩余节数-常规私教课']} </p>
+                            <p><span style="display: inline;">· 常规课程剩余节数：</span>${data['剩余节数-常规课程']} </p>
                             </div>
                             <hr>
                             <div >
                             <p><span>· 上课总节数： </span>${data['上课总次数']}  节</p>
-                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规私教课： </span>${data['上课次数-常规私教课']}  节</p>
-                            <p style="margin-left: 25px;font-size:12px;"><span>- 限时私教课： </span>${data['上课次数-限时私教课']}  节</p>
+                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规课程： </span>${data['上课次数-常规课程']}  节</p>
+                            <p style="margin-left: 25px;font-size:12px;"><span>- 限时课程： </span>${data['上课次数-限时课程']}  节</p>
                             </div>
                             <hr>
                             <div >

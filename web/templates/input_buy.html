@@ -252,9 +252,9 @@
                                 buyNum.value='';
                                 buyDays.value='';
                                 buyPay.value='';
-                                if(document.getElementById('buyType').value==='常规私教课'||document.getElementById('buyType').value==='常规团课'){
+                                if(document.getElementById('buyType').value==='常规课程'||document.getElementById('buyType').value==='常规团课'){
                                     document.getElementById('buyDays').disabled=true;
-                                }else if(document.getElementById('buyType').value ==='限时私教课' ||document.getElementById('buyType').value ==='限时团课'){
+                                }else if(document.getElementById('buyType').value ==='限时课程' ||document.getElementById('buyType').value ==='限时团课'){
                                     document.getElementById('buyDays').disabled=false;}
                                 
                             //隐藏buyhistory框
@@ -299,11 +299,11 @@
                                 errBuyType.innerText=''
 
 
-                                // if(document.getElementById('buyType').value==='常规私教课'||document.getElementById('buyType').value==='常规团课'){
+                                // if(document.getElementById('buyType').value==='常规课程'||document.getElementById('buyType').value==='常规团课'){
                                 //     document.getElementById('buyDays').disabled=true;
                                 //     document.getElementById('buyType').disabled=true;
                                 //     document.getElementById('buyNum').disabled=true;
-                                // }else if(document.getElementById('buyType').value ==='限时私教课' ||document.getElementById('buyType').value ==='限时团课'){
+                                // }else if(document.getElementById('buyType').value ==='限时课程' ||document.getElementById('buyType').value ==='限时团课'){
                                 //     document.getElementById('buyDays').disabled=false;
                                 //     document.getElementById('buyType').disabled=false;
                                 //     document.getElementById('buyNum').disabled=false;
@@ -318,9 +318,9 @@
                     }                   
                 }else{
                     // 如没有购课历史，则根据购课类型禁用或打开购课时长
-                    if(document.getElementById('buyType').value==='常规私教课'||document.getElementById('buyType').value==='常规团课'){
+                    if(document.getElementById('buyType').value==='常规课程'||document.getElementById('buyType').value==='常规团课'){
                                     document.getElementById('buyDays').disabled=true;
-                                }else if(document.getElementById('buyType').value ==='限时私教课' ||document.getElementById('buyType').value ==='限时团课'){
+                                }else if(document.getElementById('buyType').value ==='限时课程' ||document.getElementById('buyType').value ==='限时团课'){
                                     document.getElementById('buyDays').disabled=false;}
                     noBuyHisPrompt.innerText='未查询到购课记录';
 
@@ -341,15 +341,15 @@
             document.getElementById('errBuyNum').innerText='';
             document.getElementById('errBuyType').innerText='';
          
-            if(document.getElementById('buyType').value==='限时私教课'){
+            if(document.getElementById('buyType').value==='限时课程'){
                 if(document.getElementById('buyDays').value==='' &&  document.getElementById('buyNum').value ||
                     document.getElementById('buyDays').value===0 &&  document.getElementById('buyNum').value){
-                    document.getElementById('errBuyDays').innerText='限时私教课必须输入天数';
+                    document.getElementById('errBuyDays').innerText='限时课程必须输入天数';
                 }else if(document.getElementById('buyDays').value &&  document.getElementById('buyNum').value==='' ||
                     document.getElementById('buyDays').value &&  document.getElementById('buyNum').value===0){
-                    document.getElementById('errBuyNum').innerText='限时私教课必须输入节数';
+                    document.getElementById('errBuyNum').innerText='限时课程必须输入节数';
                 }else if(!(document.getElementById('buyDays').value &&  document.getElementById('buyNum').value)){
-                    document.getElementById('errBuyType').innerText='限时私教课必须同时输入节数和天数';
+                    document.getElementById('errBuyType').innerText='限时课程必须同时输入节数和天数';
                 }else{
                     document.getElementById('errBuyDays').innerText='';
                     document.getElementById('errBuyNum').innerText='';
@@ -368,23 +368,23 @@
             document.getElementById('errBuyDays').innerText='';
             document.getElementById('errBuyNum').innerText='';
             document.getElementById('errBuyType').innerText='';
-            if(buyTypeSelect.value==='限时私教课'){                    
+            if(buyTypeSelect.value==='限时课程'){                    
                 buyDaysInput.removeAttribute('disabled');
                 if(document.getElementById('buyDays').value==='' &&  document.getElementById('buyNum').value ||
                     document.getElementById('buyDays').value===0 &&  document.getElementById('buyNum').value){
-                    document.getElementById('errBuyDays').innerText='限时私教课必须输入天数'
+                    document.getElementById('errBuyDays').innerText='限时课程必须输入天数'
                 }else if(document.getElementById('buyDays').value &&  document.getElementById('buyNum').value==='' ||
                     document.getElementById('buyDays').value &&  document.getElementById('buyNum').value===0){
-                    document.getElementById('errBuyNum').innerText='限时私教课必须输入节数'
+                    document.getElementById('errBuyNum').innerText='限时课程必须输入节数'
                 }else if(!(document.getElementById('buyDays').value &&  document.getElementById('buyNum').value)){
-                    document.getElementById('errBuyType').innerText='限时私教课必须同时输入节数和天数'
+                    document.getElementById('errBuyType').innerText='限时课程必须同时输入节数和天数'
                 }else{
                     document.getElementById('errBuyDays').innerText='';
                     document.getElementById('errBuyNum').innerText='';
                     document.getElementById('errBuyType').innerText='';
                 }                    
             }
-            if(buyTypeSelect.value==='常规私教课'){      
+            if(buyTypeSelect.value==='常规课程'){      
                 buyDaysInput.value='';              
                 buyDaysInput.setAttribute('disabled','true');
             }
@@ -425,7 +425,7 @@
             try{
                 inputElements.forEach((input)=>{              
                     console.log(input.value);
-                    if(document.getElementById('buyType').value==='限时私教课' || document.getElementById('buyType').value==='限时团课'){
+                    if(document.getElementById('buyType').value==='限时课程' || document.getElementById('buyType').value==='限时团课'){
                         if(input.id!=='comment' && !input.value){
                         throw new Error('输入项 '+dicIdEmp[input.id]+' 有空值或未选择');                        
                         }
@@ -446,7 +446,7 @@
                         throw new Error('不能有0值');
                     }      
 
-                    if(document.getElementById('buyType').value==='限时私教课' || document.getElementById('buyType').value==='限时团课'){
+                    if(document.getElementById('buyType').value==='限时课程' || document.getElementById('buyType').value==='限时团课'){
                         if(
                             document.getElementById('buyDays').value==='' || document.getElementById('buyNum').value===''
                             || document.getElementById('buyDays').value===0 || document.getElementById('buyNum').value===0
@@ -475,7 +475,7 @@
                     }
                 });
 
-                // if(document.getElementById('buyCodeSelect').value==='限时私教课'){
+                // if(document.getElementById('buyCodeSelect').value==='限时课程'){
                 //         if(
                 //             document.getElementById('buyDays').value==='' || document.getElementById('buyNum').value===''
                 //             || document.getElementById('buyDays').value===0 || document.getElementById('buyNum').value===0
@@ -517,7 +517,7 @@
                     data['operateTime']=dateToString(operateTime,'dateTime');
 
                     // 非限时课程，时长设置为999天
-                    if(['常规私教课','常规团课'].includes(data['购课类型'])){
+                    if(['常规课程','常规团课'].includes(data['购课类型'])){
                         data['购课时长（天）']=999;
                     }
 
@@ -758,7 +758,7 @@
                 document.getElementById("cus_name").innerText = data['会员编码及姓名'];
                 document.getElementById("total_cls_days").innerText = data['上课总天数'];
                 document.getElementById("total_pay").innerText = data['总消费金额'];
-                document.getElementById("normal_remain").innerText = data['剩余节数-常规私教课']
+                document.getElementById("normal_remain").innerText = data['剩余节数-常规课程']
                 document.getElementById("lmt_yn").innerText = data['限时课程是否有效']
                 document.getElementById("lmt_due_date").innerText = data['限时课程到期日']
 

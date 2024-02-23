@@ -1314,7 +1314,7 @@ class LzService(Flask):
             # print('dic_limit_maxdate_rec:',dic_limit_cls_recs)
 
             # 获取并计算未开课的限时课程表，包括限时私教和团课
-            df_buy_limit = df_buy[df_buy['购课类型'].isin(['限时私教课', '限时团课'])]
+            df_buy_limit = df_buy[df_buy['购课类型'].isin(['限时课程', '限时团课'])]
             df_not_start=self.get_not_start_lmt_list(cus_name=cus_name_input)
             df_not_start.fillna('',inplace=True)
             # print(type(df_not_start),df_not_start)
@@ -1350,7 +1350,7 @@ class LzService(Flask):
         conn=self.connect_mysql() 
         cursor=conn.cursor()
         try:
-            #未开启限时私教课信息
+            #未开启限时课程信息
             sql='''
                 select DISTINCT card_id,card_start_time,prd,end_time,cls_qty from cards_table where card_id in 
                 (select card_id from cardholder_card_table where cus_id=%s)
@@ -1363,7 +1363,7 @@ class LzService(Flask):
             not_start_limit_recs=cursor.fetchall()
             # print(not_start_limit_recs)
 
-            #当天有效的限时私教课信息
+            #当天有效的限时课程信息
             current_day=datetime.datetime.now().strftime('%Y-%m-%d')
             # sql='''
             #     select DISTINCT card_id,card_start_time,prd,end_time from cards_table where card_id in 
@@ -1479,7 +1479,7 @@ class LzService(Flask):
         # else:
         #     maxdate_limit_cls_rec={'0':{'id':'','cus_id':'','cus_name':'','购课编码':'','限时课程起始日':'','限时课程结束日':''}}   
 
-        # maxdate_limit_cls_rec限时私教课
+        # maxdate_limit_cls_rec限时课程
         # sql='''
         # SELECT card_id,max(end_time) FROM cards_table 
         # where card_id in (select card_id from cardholder_card_table where cus_id=%s)
@@ -1585,7 +1585,7 @@ class LzService(Flask):
                 ) AS buyrecfilter ON filtered_a.card_id=buyrecfilter.card_id   
             GROUP BY filtered_a.card_id
         '''
-        cursor.execute(sql,(cus_id,'long_prd','私教',cls_tkn_time,cus_id,'常规私教课'))
+        cursor.execute(sql,(cus_id,'long_prd','私教',cls_tkn_time,cus_id,'常规课程'))
         cards_id_cgsj=cursor.fetchall()     
 
         return jsonify({'buy_list':buy_list,
@@ -1703,7 +1703,7 @@ class LzService(Flask):
         app.quit()
         
 
-        if dat['购课类型'].strip() in ['限时私教课','限时团课']:
+        if dat['购课类型'].strip() in ['限时课程','限时团课']:
             aux_res=self.add_rec_in_aux_table(dat['客户购课编号'])
         else:
             aux_res='非限时课程'
@@ -1738,7 +1738,7 @@ class LzService(Flask):
 
 
             #写入卡表          
-            if dat['购课类型']=='限时私教课' or dat['购课类型']=='限时团课':
+            if dat['购课类型']=='限时课程' or dat['购课类型']=='限时团课':
                 #查询表中是否已有购课流水，如有，说明为补交余款，获取原来相应的起始和终止日
                 sql='''select distinct card_start_time, end_time from cards_table 
                     where card_id in 
@@ -1758,7 +1758,7 @@ class LzService(Flask):
                     pass
 
                 
-            elif dat['购课类型']=='常规私教课' or dat['购课类型']=='常规团课':
+            elif dat['购课类型']=='常规课程' or dat['购课类型']=='常规团课':
                 #查询表中是否已有购课流水，如有，说明为补交余款，获取原来相应的起始和终止日
                 sql='''select distinct card_start_time, end_time from cards_table 
                     where card_id in 
@@ -1839,7 +1839,7 @@ class LzService(Flask):
             cus_name=sorted_data['cus_name']
             res_txt=f'{cus_name} 增加一条购课记录'
 
-            # if sorted_data['购课类型'] in ['限时私教课','限时团课']:
+            # if sorted_data['购课类型'] in ['限时课程','限时团课']:
             #     try:
             #         sql=f'''
             #             insert into not_start_lmt_table
@@ -2361,7 +2361,7 @@ class LzService(Flask):
 
         result['上课总天数']=total_cls_tkn_days        
         
-        #上课次数-限时私教课
+        #上课次数-限时课程
         sql='''
             select count(cls_datetime) as cls_tkn_count from cls_tkn_rec_table 
             WHERE card_id in 
@@ -2386,11 +2386,11 @@ class LzService(Flask):
             print('get cls_tkn_count_lmt_sj:',e)
             cls_tkn_count_lmt_sj=0
 
-        result['上课次数-限时私教课']=cls_tkn_count_lmt_sj
+        result['上课次数-限时课程']=cls_tkn_count_lmt_sj
 
-        #上课次数-常规私教课，
+        #上课次数-常规课程，
         # 通过cus_id查询到card_id，再查询card_id在cls_tkn_rec_table中的节数（次数）
-        # sql=f"select count(cls_datetime) as cls_tkn_count from cls_tkn_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and cls_type='常规私教课'"
+        # sql=f"select count(cls_datetime) as cls_tkn_count from cls_tkn_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and cls_type='常规课程'"
         sql='''
             select count(card_id) from cls_tkn_rec_table 
             where card_id in (select card_id from cards_table 
@@ -2408,7 +2408,7 @@ class LzService(Flask):
             print('get cls_tkn_count_cg_sj:',e)
             cls_tkn_count_cg_sj=0
 
-        result['上课次数-常规私教课']=cls_tkn_count_cg_sj
+        result['上课次数-常规课程']=cls_tkn_count_cg_sj
 
         #上课次数-限时团课
         # sql=f"select count(cls_datetime) as cls_tkn_count from cls_tkn_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and cls_type='限时团课'"
@@ -2469,7 +2469,7 @@ class LzService(Flask):
         # if not cls_tkn_count:
         #     cls_tkn_count=0
         try:
-            result['上课总次数']=result['上课次数-限时私教课']+result['上课次数-常规私教课']+ \
+            result['上课总次数']=result['上课次数-限时课程']+result['上课次数-常规课程']+ \
                                 result['上课次数-限时团课']+result['上课次数-常规团课']
         except Exception as e:
             print('calculate total cls tkn qty error :',e)
@@ -2485,19 +2485,19 @@ class LzService(Flask):
         result['上课频率']=cls_frqcy
 
         ######################################################################
-        #购课次数-限时私教课
-        sql=f"select count(buy_date) as buy_count from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='限时私教课'"
+        #购课次数-限时课程
+        sql=f"select count(buy_date) as buy_count from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='限时课程'"
         cursor.execute(sql)
         buy_count_lmt_sj=cursor.fetchall()
         buy_count_lmt_sj=buy_count_lmt_sj[0][0]
         if not buy_count_lmt_sj:
             buy_count_lmt_sj=0
 
-        result['购课次数-限时私教课']=buy_count_lmt_sj
+        result['购课次数-限时课程']=buy_count_lmt_sj
 
-        #购课次数-常规私教课
+        #购课次数-常规课程
         sql='''select count(buy_date) as buy_count from buy_rec_table 
-                WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规私教课'
+                WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规课程'
             '''
             
         cursor.execute(sql)
@@ -2506,7 +2506,7 @@ class LzService(Flask):
         if not buy_count_cg_sj:
             buy_count_cg_sj=0
 
-        result['购课次数-常规私教课']=buy_count_cg_sj
+        result['购课次数-常规课程']=buy_count_cg_sj
 
         #购课次数-限时团课
         sql=f"select count(buy_date) as buy_count from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='限时团课'"
@@ -2529,8 +2529,8 @@ class LzService(Flask):
         result['购课次数-常规团课']=buy_count_cg_grp
 
         ###########################################
-        #购课节数-常规私教课
-        # sql=f"select sum(buy_num) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规私教课'"
+        #购课节数-常规课程
+        # sql=f"select sum(buy_num) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规课程'"
         # sql='''
         # select sum(cls_qty) from cards_table 
         # WHERE card_id in  (select card_id from cardholder_card_table where cus_id=%s) 
@@ -2549,7 +2549,7 @@ class LzService(Flask):
                 as subq
             group by card_id;
         '''
-        cursor.execute(sql,(cus_id,'常规私教课'))
+        cursor.execute(sql,(cus_id,'常规课程'))
         try:
             buy_num_cg_sj=cursor.fetchone()[1]
             # buy_num_cg_sj=buy_num_cg_sj[0]
@@ -2559,7 +2559,7 @@ class LzService(Flask):
             print('buy num cj sj is null, set 0')
             buy_num_cg_sj=0
 
-        result['购课节数-常规私教课']=float(buy_num_cg_sj)
+        result['购课节数-常规课程']=float(buy_num_cg_sj)
 
 
 
@@ -2581,7 +2581,7 @@ class LzService(Flask):
 
 
         ###########################################
-        #剩余节数-常规私教课
+        #剩余节数-常规课程
         sql=f"SELECT cls_tkn_adj_num_cg_sj from adjust_table where cus_name='{cus_name}' and cus_id='{cus_id}'"
         cursor.execute(sql)
         adj_num_cg_sj=cursor.fetchall()
@@ -2590,29 +2590,29 @@ class LzService(Flask):
         else:
             adj_num_cg_sj=0
 
-        result['剩余节数-常规私教课']=result['购课节数-常规私教课']-result['上课次数-常规私教课']-adj_num_cg_sj
+        result['剩余节数-常规课程']=result['购课节数-常规课程']-result['上课次数-常规课程']-adj_num_cg_sj
 
 
         #########################################
-        #消费金额-限时私教课
-        sql=f"select sum(real_pay) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='限时私教课'"
+        #消费金额-限时课程
+        sql=f"select sum(real_pay) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='限时课程'"
         cursor.execute(sql)
         total_pay_lmt_sj=cursor.fetchall()
         total_pay_lmt_sj=total_pay_lmt_sj[0][0]
         if not total_pay_lmt_sj:
             total_pay_lmt_sj=0
 
-        result['消费金额-限时私教课']=float(total_pay_lmt_sj)
+        result['消费金额-限时课程']=float(total_pay_lmt_sj)
 
-        #消费金额-常规私教课
-        sql=f"select sum(real_pay) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规私教课'"
+        #消费金额-常规课程
+        sql=f"select sum(real_pay) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='常规课程'"
         cursor.execute(sql)
         total_pay_cg_sj=cursor.fetchall()
         total_pay_cg_sj=total_pay_cg_sj[0][0]
         if not total_pay_cg_sj:
             total_pay_cg_sj=0
 
-        result['消费金额-常规私教课']=float(total_pay_cg_sj)
+        result['消费金额-常规课程']=float(total_pay_cg_sj)
 
         #消费金额-限时团课
         sql=f"select sum(real_pay) from buy_rec_table WHERE cus_name='{cus_name}' and cus_id='{cus_id}' and buy_type='限时团课'"
@@ -2653,7 +2653,7 @@ class LzService(Flask):
         buy_date=data['buy_date']
 
         if buy_type=='':
-            buy_type='限时私教课'
+            buy_type='限时课程'
         
         
         cls_type=self.config_lz['cls_type_config'][buy_type]['type']        
