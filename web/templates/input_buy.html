@@ -38,10 +38,15 @@
         <ul id="cus_info"></ul>
 
         <h3>购课类型</h3>
-        <select id="buyType"  onchange="generateBuyCodeSelect()">
+        <select id="buyType"  onchange="generateBuyCodeSelect();generateClsNameSelect();">
             <!-- <option value="">请选择</option> -->
         </select>
         <div id="errBuyType" class="inline2"></div>
+        
+        <h3>购课名称</h3>
+        <select id="buyClsName" onchange="generateBuyCodeSelect();">
+            <!-- <option value="">请选择</option> -->
+        </select>
 
         <h3>购课节数</h3>
         <input type="number" id="buyNum" name="buyNum" step="1" min="0" oninput="onInputBuyNumDaysCheck(this.id)">
@@ -137,6 +142,7 @@
                 tmplt_info=data;
                 console.log(data)
                 generateBuyTypeSelect(data);
+                generateClsNameSelect(data);
                 showBuyTypePrompt();
                 cashierSelect(data);
                 incomeTypeSelect(data);
@@ -511,6 +517,7 @@
                     data['购课流水号']=document.getElementById('buyCodeSelect').value;
                     data['购课卡号']=data['购课流水号'].split('-')[0];
                     data['购课类型']=document.getElementById('buyType').value;
+                    data['购课名称']=document.getElementById('buyClsName').value;
                     data['收款人']=document.getElementById('cashier').value;
                     data['收入类别']=document.getElementById('incomeType').value;
                     data['operatorId']=insId;
@@ -610,11 +617,34 @@
             isValidDate();
         }
 
+        function generateClsNameSelect(data){     
+            if(!data){
+                data=tmplt_info
+            }                
+            const buyType=document.getElementById('buyType').value;
+            if(buyType===''){
+                buyType='限时课程';
+            }
+
+            // console.log('clsNameData:',data['cls_type_name_dic'][buyType])   
+            const buyClsName=document.getElementById('buyClsName');
+            buyClsName.innerHTML='';
+            data['cls_type_name_dic'][buyType].forEach(clsName=>{
+                const clsNameOpt=document.createElement('option');
+                clsNameOpt.value=clsName;
+                clsNameOpt.textContent=clsName;
+                buyClsName.appendChild(clsNameOpt);
+            });
+
+            generateBuyCodeSelect();
+        }
+
         function generateBuyCodeSelect(){
             const currentTime=dateFormat(new Date(),'date_time_14_digits');
             console.log(currentTime)
             const cusIdName=document.getElementById('cusNameInput').value;
             const buyType=document.getElementById('buyType').value;
+            const buyClsName=document.getElementById('buyClsName').value;
             const buyDate=document.getElementById('dateInput').value.trim();
             console.log('buyType:',buyType)
             fetch('./get_cus_cards_by_type', {
@@ -622,7 +652,7 @@
                             headers: {
                                 'Content-Type': 'application/json'
                                 },
-                            body:JSON.stringify({'cus_id_name':cusIdName,'buy_type':buyType,'buy_date':buyDate})
+                            body:JSON.stringify({'cus_id_name':cusIdName,'buy_type':buyType,'buy_cls_name':buyClsName,'buy_date':buyDate})
                             })
                             .then(response => response.json())
                             .then(data => {

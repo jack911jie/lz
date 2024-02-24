@@ -32,9 +32,14 @@
             <select id="insSelect"></select>
         </div>        
 
-        <h3>上课的课程类型</h3>
-        <select id="buyType" onchange="getValidClass()">
+        <h3>课程类型</h3>
+        <select id="buyType" onchange="getValidClass();generateClsNameSelect();">
         </select>
+
+        <h3>课程名称</h3>
+        <select id="buyClsName" onchange="getValidClass();">
+        </select>
+
         <div id="cardId" class="form-row" ><h4 style="margin-top:20px;margin-left:0px;">关联卡号：</h4><select id='cardIdStr'></select><span id="clsRemain"></span></div>
         
         <div id="validClassEndTime"></div>
@@ -244,6 +249,7 @@
         let insId;
         let insRole;
         let insIdReload;
+        let tmplt_info;
         // 在页面加载完成后，将返回修改按钮和性别输入框设置为不可见
         document.addEventListener("DOMContentLoaded", function(){
             loginCheck();
@@ -264,9 +270,11 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    tmplt_info=data;
             //将data赋值给块变量cus_list，供后面的handleInput使用
                 console.log('get data from template file:',data);
                 generateBuyTypeList(data);
+                generateClsNameSelect(data);
                   })
                 .catch(error => console.error('Error:', error));
 
@@ -321,6 +329,26 @@
            console.log('dom loaded:',insInfo)
 
         });
+
+        function generateClsNameSelect(data){     
+            if(!data){
+                data=tmplt_info;
+            }                
+            const buyType=document.getElementById('buyType').value;
+            if(buyType===''){
+                buyType='限时课程';
+            }
+
+            // console.log('clsNameData:',data['cls_type_name_dic'][buyType])   
+            const buyClsName=document.getElementById('buyClsName');
+            buyClsName.innerHTML='';
+            data['cls_type_name_dic'][buyType].forEach(clsName=>{
+                const clsNameOpt=document.createElement('option');
+                clsNameOpt.value=clsName;
+                clsNameOpt.textContent=clsName;
+                buyClsName.appendChild(clsNameOpt);
+            });
+        }
 
         function handleInput() {
             // 获取输入框中的值
@@ -454,6 +482,7 @@
             const errBuyType=document.getElementById('errBuyType');
             const clsTakenTime=document.getElementById('datetime');
             const cardId=document.getElementById('cardId');
+            const clsName=document.getElementById('buyClsName');
 
             try{
                 document.getElementById('clsRemain').textContent='';
@@ -486,6 +515,7 @@
                     const maxdate_limit_class_grp=data['maxdate_limit_class_grp'];
                     const limit_prd_card_id_grp=data['limit_prd_card_id_grp'];
                     const long_prd_sj_card_ids=data['long_prd_sj_card_ids'];
+                    const long_prd_yj_card_ids=data['long_prd_yj_card_ids'];
                     const clsType=document.getElementById('buyType').value;
                     const cardIdSel=document.getElementById('cardIdStr');
                     
@@ -500,7 +530,7 @@
                                 validClassEndTime.textContent=`本卡限时课程结束日：${dateToString(maxdate_limit_class_sj,'date')}`
                                 cardId.style.display='block';
                                 // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${limit_prd_card_id_sj}</span>`;
-                                const cardIdSel=document.getElementById('cardIdStr');
+                                // const cardIdSel=document.getElementById('cardIdStr');
                                 cardIdSel.textContent='';
                                 const opt=document.createElement('option');
                                 opt.value=limit_prd_card_id_sj;
@@ -538,7 +568,7 @@
                                 const compareDate=new Date(classDate)-new Date(maxdate_limit_class_grp);
                                 validClassEndTime.textContent=`本卡限时课程结束日：${dateToString(maxdate_limit_class_grp,'date')}`
                                 cardId.style.display='block';
-                                const cardIdSel=document.getElementById('cardIdStr');
+                                // const cardIdSel=document.getElementById('cardIdStr');
                                 cardIdSel.textContent='';
                                 const opt=document.createElement('option');
                                 opt.value=limit_prd_card_id_grp;
@@ -563,32 +593,64 @@
                             // alert('无有效的限时课程')
                         }
                     }else if(clsType==='常规课程' ){
-                        
-                        const normalClassRemain=classAndBodyHistory['剩余节数-常规课程'];      
-                        if(normalClassRemain && normalClassRemain>0){
-                            errBuyType.textContent='';
-                            allTrainContents.style.display='block';
-                            cardId.style.display='block';
-                            // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${long_prd_sj_card_id}</span>`;
-                            
-                            cardIdSel.textContent='';
-                            long_prd_sj_card_ids.forEach((lg_id,index)=>{
-                                console.log(lg_id[0])
-                                const opt=document.createElement('option');
-                                opt.value=lg_id[0];
-                                opt.text=lg_id[0];
-                                cardIdSel.appendChild(opt);
-                                if(index===0){
-                                    opt.selected=true;
-                                }
-                                //监听select
-                                showClsRemain(long_prd_sj_card_ids);
-                            });                            
-                        }else{
-                            errBuyType.textContent='无常规课程';
-                            allTrainContents.style.display='none';
-                            cardId.style.display='none';
+                        if(clsName.value==='私教'){
+                            const normalClassRemainSj=classAndBodyHistory['剩余节数-常规课程-私教'];      
+                            if(normalClassRemainSj && normalClassRemainSj>0){
+                                errBuyType.textContent='';
+                                allTrainContents.style.display='block';
+                                cardId.style.display='block';
+                                // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${long_prd_sj_card_id}</span>`;
+                                
+                                cardIdSel.textContent='';
+                                long_prd_sj_card_ids.forEach((lg_id,index)=>{
+                                    console.log(lg_id[0])
+                                    const opt=document.createElement('option');
+                                    opt.value=lg_id[0];
+                                    opt.text=lg_id[0];
+                                    cardIdSel.appendChild(opt);
+                                    if(index===0){
+                                        opt.selected=true;
+                                    }
+                                    //监听select
+                                    showClsRemain(long_prd_sj_card_ids);
+                                });   
+                            }else{
+                                errBuyType.textContent='无常规课程';
+                                allTrainContents.style.display='none';
+                                cardId.style.display='none';
+                            }
                         }
+                        
+                        if(clsName.value==='瑜伽'){
+                            const normalClassRemainYj=classAndBodyHistory['剩余节数-常规课程-瑜伽'];      
+                            if(normalClassRemainYj && normalClassRemainYj>0){
+                                errBuyType.textContent='';
+                                allTrainContents.style.display='block';
+                                cardId.style.display='block';
+                                // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${long_prd_sj_card_id}</span>`;
+                                
+                                cardIdSel.textContent='';
+                                long_prd_yj_card_ids.forEach((lg_id,index)=>{
+                                    console.log(lg_id[0])
+                                    const opt=document.createElement('option');
+                                    opt.value=lg_id[0];
+                                    opt.text=lg_id[0];
+                                    cardIdSel.appendChild(opt);
+                                    if(index===0){
+                                        opt.selected=true;
+                                    }
+                                    //监听select
+                                    showClsRemain(long_prd_yj_card_ids);
+                                });   
+                            
+                            }else{
+                                errBuyType.textContent='无瑜伽课程';
+                                allTrainContents.style.display='none';
+                                cardId.style.display='none';
+                            }
+                        }
+                                                 
+                        
                         //手动触发select
                         const event=new Event('change');
                         cardIdSel.dispatchEvent(event)                        
@@ -617,7 +679,7 @@
             clsRemain.textContent='';
             cardIdStr.addEventListener('change',function(){   
                 const cardIdSel=cardIdStr.value;
-                console.log(data)
+                // console.log(data)
                 data.forEach(item=>{
                     if(item[0]===cardIdSel){
                         clsRemain.textContent=` 该卡剩余${parseInt(item[2])}节`
@@ -728,7 +790,7 @@
             classTakenInfo.innerHTML=''
             console.log('reported by Name:',cusName);
             console.log('data:',data)
-            const total_cls_tkn_qty=data['上课次数-常规课程']+data['上课次数-限时课程']+data['上课次数-限时团课']+data['上课次数-常规团课']
+            const total_cls_tkn_qty=data['上课次数-常规课程-私教']+data['上课次数-常规课程-瑜伽']+data['上课次数-限时课程-私教']+data['上课次数-限时团课']+data['上课次数-常规团课']
             
             
             try{
@@ -760,13 +822,14 @@
                             <p><span>· 最近一次限时课程到期日：</span>${dateFormat(new Date(data['限时课程到期日']),'date')?dateFormat(new Date(data['限时课程到期日']),'date'):'-'}</p>
                             </div>
                             <div >
-                            <p><span style="display: inline;">· 常规课程剩余节数：</span>${data['剩余节数-常规课程']} </p>
+                            <p><span style="display: inline;">· 常规课程剩余节数：</span>${parseInt(data['剩余节数-常规课程-私教'])+parseInt(data['剩余节数-常规课程-瑜伽'])} </p>
                             </div>
                             <hr>
                             <div >
                             <p><span>· 上课总节数： </span>${data['上课总次数']}  节</p>
-                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规课程： </span>${data['上课次数-常规课程']}  节</p>
-                            <p style="margin-left: 25px;font-size:12px;"><span>- 限时课程： </span>${data['上课次数-限时课程']}  节</p>
+                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规私教课程： </span>${data['上课次数-常规课程-私教']}  节</p>
+                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规瑜伽课程： </span>${data['上课次数-常规课程-瑜伽']}  节</p>
+                            <p style="margin-left: 25px;font-size:12px;"><span>- 限时课程： </span>${data['上课次数-限时课程-私教']}  节</p>
                             </div>
                             <hr>
                             <div >
@@ -1323,6 +1386,7 @@
                 'cls_tkn_time':document.getElementById('datetime').value.split("T")[1]+':00',
                 'cls_long':document.getElementById('clsLong').value,
                 'cls_type':document.getElementById('buyType').value,
+                'cls_name':document.getElementById('buyClsName').value,
                 'card_id':document.getElementById('cardIdStr').value,
                 'ins_name':ins_name,
                 'ins_id':ins_id,
@@ -1587,6 +1651,7 @@
 
             document.getElementById('basic_cls_comment').value = data['cls_tkn']['basic_cls_comment'];
             document.getElementById('buyType').value = data['cls_tkn']['cls_type'];
+            document.getElementById('buyClsName').value=data['cls_tkn']['cls_name'];
             document.getElementById('cardId').value = data['cls_tkn']['cardId'];
             
 
