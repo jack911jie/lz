@@ -8,9 +8,9 @@
 </head>
 <body style="background-color:#fffbf6">
 <div class="login-container">
-        <div class="login-box">
-            <div id="logo">
-                <img src="{{ url_for('static', filename='pics/logo.png') }}" alt="minghulogo" style="width:120px;height:auto;opacity: 0.86;">
+        <div class="login-box" style="height:350px;">
+            <div id="logo" style="margin-top:10px;">
+                <img src="{{ url_for('static', filename='pics/logo_llz.png') }}" alt="llzlogo" style="width:100px;height:auto;opacity: 0.86;">
                 </div>
             <div style="margin:15px;"><span id="user_id">{{session_ins_id}}</span><span  id="user_name">{{session_ins_name}}</span></div>
             <div style="color:#d26d6d">第一次登录请修改密码</div>

@@ -14,31 +14,31 @@
         <div id="date" style="display:flex;flex-direction:column;align-items:center;text-align:center;color:rgb(171, 176, 179); font-size:20px; margin-bottom: 20px;"></div>
 
         
-        <div class='cover-button' style="border:1px solid #abc98a; background-color:#a9d594;">
+        <div id='cusBook' class='cover-button' style="border:1px solid #abc98a; background-color:#a9d594;">
             <a href="./ins_book" style="color:rgb(108, 109, 90);">会员预约排课</a>
         </div>
 
-        <div class='cover-button' style="border:1px solid #f1edd3; background-color:#f1edd3;">
+        <div id='formalClsRec' class='cover-button' style="border:1px solid #f1edd3; background-color:#f1edd3;">
             <a href="./cus_cls_input" style="color:rgb(136, 116, 25);">正式课上课</a>
         </div>
        
-        <div class='cover-button' style="border:1px solid #fce3fa; background-color:#fce3fa;">
+        <div id='bodyRec' class='cover-button' style="border:1px solid #fce3fa; background-color:#fce3fa;">
             <a href="./input_body" style="color:rgb(167, 81, 167);">会员体测录入</a>
         </div>       
 
-        <div class='cover-button' style="border:1px solid #d0dbff; background-color:#d0dbff;">
+        <div id='trialClsRec' class='cover-button' style="border:1px solid #d0dbff; background-color:#d0dbff;">
            <a href="./trial_class" style="color:rgb(57, 63, 126);">体验课上课</a>
         </div>
 
-        <div class='cover-button' style="border:1px solid #d3ffde; background-color:#d3ffde;">
+        <div id='newCus' class='cover-button' style="border:1px solid #d3ffde; background-color:#d3ffde;">
             <a href="./new_cus" style="color:rgb(50, 107, 64);">新增会员</a>
         </div>
 
-        <div class='cover-button' style="border:1px solid #c8f1fc; background-color:#c8f1fc;">
+        <div id='cusBuy' class='cover-button' style="border:1px solid #c8f1fc; background-color:#c8f1fc;">
             <a href="./input_buy" style="color:rgb(41, 95, 145);">会员购课</a>
         </div>
 
-        <div class='cover-button' style="border:1px solid #f7e2d5; background-color:#f7e2d5;">
+        <div id='lmtStart' class='cover-button' style="border:1px solid #f7e2d5; background-color:#f7e2d5;">
             <a href="./start_limit_class" style="color:rgb(238, 136, 96);">限时课程开课</a>
         </div> 
         
@@ -49,6 +49,29 @@
     <script>
         document.addEventListener('DOMContentLoaded',function(){
             loginCheck();
+
+            const insInfos=hideInsSelectBlockAndGetInsInfo();
+            const insId=insInfos['sessionInsId'];
+            const insName=insInfos['sessionInsName'];
+            const insRole=insInfos['sessionInsRole'];
+
+            //教练角色不显示某些页面
+            const newCus=document.getElementById('newCus');
+            const cusBuy=document.getElementById('cusBuy');
+            const lmtStart=document.getElementById('lmtStart');
+
+            console.log('ins role:',insRole)
+
+            if(insRole==='ins'){
+                newCus.style.display='none';
+                cusBuy.style.display='none';
+                lmtStart.style.display='none';
+            }else{
+                newCus.style.display='block';
+                cusBuy.style.display='block';
+                lmtStart.style.display='block';
+            }
+
             const goIndexButton=document.getElementById('goIndex');
             goIndexButton.style.display='none';
             const dateBlock=document.getElementById('date');

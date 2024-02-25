@@ -97,6 +97,7 @@
     <script src="../static/js/moment.min.js"></script>
     <script src="../static/js/common.js"></script>
     <script> 
+        let insId;
         let cus_list;
         let selectedName;
         let tmplt_info;
@@ -169,6 +170,11 @@
             insId=insInfos['sessionInsId'];
             insName=insInfos['sessionInsName'];
             insRole=insInfos['sessionInsRole'];
+
+            //教练角色不允许进入该页面，返回Index
+            if(insRole==='ins'){
+                window.location.replace('./index');
+            }
 
             generateBuyCodeSelect();
             console.log(insInfos)

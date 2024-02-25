@@ -93,6 +93,11 @@
             insName=insInfo['sessionInsName'];
             insId=insInfo['sessionInsId'];
             insRole=insInfo['sessionInsRole'];
+            
+            //教练角色不允许进入该页面，返回Index
+            if(insRole==='ins'){
+                window.location.replace('./index');
+            }
 
             selectToday(id='startDate',format='date');
             const startDate=document.getElementById('startDate')
