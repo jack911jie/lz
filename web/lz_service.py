@@ -2748,7 +2748,7 @@ class LzService(Flask):
         if buy_type=='':
             buy_type='限时课程'
         
-        print(buy_cls_name)
+        # print(buy_cls_name)
         
         cls_type=self.config_lz['cls_type_config'][buy_type]['type']        
         # cls_name=self.config_lz['cls_type_config'][buy_type]['name']

@@ -1171,16 +1171,15 @@
             // 遍历数组，为每个选项生成radio，并添加到容器中
             trainList.forEach(function(option) {
                 // console.log(option);
-                // 创建一个radio元素
+                // 创建一个radio元素，编号按输入的div，即selectElement的id中带的序号来，保证在切换动作类型或删除、复制时，序号的一致性。
                 const radioInput = document.createElement("input");
                 radioInput.setAttribute("type", "radio");
-                radioInput.setAttribute("name", "trainItem-0");
+                radioInput.setAttribute("name", "trainItem-"+selectElement.id.split('-')[1]);        
                 radioInput.setAttribute("value", option);
                 radioInput.setAttribute("class","dynamic-radio");
                 radioInput.setAttribute("onchange", "generateTrainItem(this)");
-                
 
-                if(firstRadio){
+                if(firstRadio){    
                     radioInput.checked=true;
                     firstRadio=false;
                 }
