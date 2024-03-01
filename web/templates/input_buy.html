@@ -177,7 +177,7 @@
             }
 
             generateBuyCodeSelect();
-            console.log(insInfos)
+            // console.log(insInfos)
             
             
         });
@@ -347,7 +347,7 @@
 
         function onInputBuyNumDaysCheck(id){
             console.log(id)
-            console.log(document.getElementById('buyType').value,document.getElementById('buyNum').value,document.getElementById('buyDays').value)
+            // console.log(document.getElementById('buyType').value,document.getElementById('buyNum').value,document.getElementById('buyDays').value)
             const InputBox=document.getElementById(id)
             document.getElementById('errBuyDays').innerText='';
             document.getElementById('errBuyNum').innerText='';
@@ -374,7 +374,7 @@
 
         function showBuyTypePrompt(){
             const buyTypeSelect=document.getElementById('buyType');
-            console.log(buyTypeSelect.value);
+            // console.log(buyTypeSelect.value);
             const buyDaysInput=document.getElementById('buyDays');               
             buyDaysInput.removeAttribute('disabled');
             document.getElementById('errBuyDays').innerText='';
@@ -436,7 +436,7 @@
             }
             try{
                 inputElements.forEach((input)=>{              
-                    console.log(input.value);
+                    // console.log(input.value);
                     if(document.getElementById('buyType').value==='限时课程' || document.getElementById('buyType').value==='限时团课'){
                         if(input.id!=='comment' && !input.value){
                         throw new Error('输入项 '+dicIdEmp[input.id]+' 有空值或未选择');                        
@@ -607,7 +607,7 @@
                 if (cusName !== "" && dateInput !== "" ) {
                     // var cusIDName=document.getElementById('cusNameInput').value
                     const testBuyCode=cusName+dateTxt
-                    console.log(testBuyCode)
+                    // console.log(testBuyCode)
                     if(ptn.test(testBuyCode)){
                         const buyCodeInput=document.getElementById('buyCode');
                         buyCodeInput.value=testBuyCode;
@@ -647,12 +647,12 @@
 
         function generateBuyCodeSelect(){
             const currentTime=dateFormat(new Date(),'date_time_14_digits');
-            console.log(currentTime)
+            // console.log(currentTime)
             const cusIdName=document.getElementById('cusNameInput').value;
             const buyType=document.getElementById('buyType').value;
             const buyClsName=document.getElementById('buyClsName').value;
             const buyDate=document.getElementById('dateInput').value.trim();
-            console.log('buyType:',buyType)
+            // console.log('buyType:',buyType)
             fetch('./get_cus_cards_by_type', {
                             method: 'POST',
                             headers: {
@@ -663,11 +663,11 @@
                             .then(response => response.json())
                             .then(data => {
                         //将data赋值给块变量cus_list，供后面的handleInput使用
-                                console.log(data);                               
+                                // console.log(data);                               
                                 if(data['res']==='ok'){
                                     const buyCodeSel=document.getElementById('buyCodeSelect');
                                     if(cusIdName){
-                                        console.log(data['card_ids'])
+                                        // console.log(data['card_ids'])
                                         
                                         buyCodeSel.innerText='';
                                         data['card_ids'].forEach(card=>{
