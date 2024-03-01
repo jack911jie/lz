@@ -17,6 +17,10 @@
         <div id="cusList" class="cus-list-input-start-limit-class" style="display:none;"></div>
         <div id="currentClass"></div>
 
+        <div class="form-row">
+            <h4 style="width:80px;">课程名称</h4><select id='clsNameSel' onchange="getBuyCodeList()"></select>
+        </div>
+
         <div id="openInsBlock" class="form-row">
         <h4 style="width:80px;">开课人</h4>
         <select id="insSelect">            
@@ -71,6 +75,7 @@
     <script> 
         let cus_list;
         let tmplt_info;
+        let cls_types;
         let not_start_buy_code_list;
         let limit_cls_recs;
         let buy_list;
@@ -115,6 +120,7 @@
             //将data赋值给块变量cus_list，供后面的handleInput使用
                 tmplt_info=data;        
                 console.log(tmplt_info); 
+                generateClsName(data['cls_type_name_dic']['限时课程']);
                   })
                 .catch(error => console.error('Error:', error));
 
@@ -150,7 +156,15 @@
             
         });
 
-
+        function generateClsName(clsNames){
+            const clsNameSel=document.getElementById('clsNameSel');
+            clsNames.forEach(cls=>{
+                const opt=document.createElement('option');
+                opt.value=cls;
+                opt.textContent=cls;
+                clsNameSel.appendChild(opt);
+            });
+        }
         
 
         function checkSubmit(){
@@ -182,6 +196,7 @@
             const cusName=document.getElementById('cusNameInput').value;
             const checkValidResult=checkSubmit();
             const startType=document.querySelector('input[name="startTypeRadio"]:checked').value;
+            const clsName=document.getElementById('clsNameSel').value;
             let insIdSend;
             if(checkValidResult==='OK'){
                 document.getElementById('showDealResult').style.display='block';
@@ -196,6 +211,8 @@
                 data={
                     'cus_name_input':cusName,
                     'card_id':document.getElementById('selectBuyCodeContainer').value,
+                    'card_type':'限时课程',
+                    'cls_name':clsName,
                     'start_date':document.getElementById('startDate').value,
                     'end_date':document.getElementById('endDate').value,
                     'ins_id':insIdSend,
@@ -237,8 +254,9 @@
 
         function getBuyCodeList(cusName=''){
             if(cusName===''){
-                cusName=document.getElementById('cusNameInput').value
+                cusName=document.getElementById('cusNameInput').value;
             }
+            const clsName=document.getElementById('clsNameSel').value;
             const selectCardBlock=document.getElementById('selectCardBlock');
             const selectBuyCodeContainer=document.getElementById('selectBuyCodeContainer');
             const buyHistoryPrompt=document.getElementById('buyHistoryPrompt');
@@ -275,15 +293,15 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
+                    console.log('all lmt infos:',data)
         
                     if(data['res']==='ok'){
                         //目前有限时有效课，有待开 or 有限时有效课，无待开 —— 均不可开新课，但可以延长
-                        if(data['current_valid_limit_rec'].length>0 && data['not_start_limit_recs'].length>0 || data['current_valid_limit_rec'].length>0 && data['not_start_limit_recs'].length===0){
+                        if(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'].length>0 && data['lmt_cls_infos'][clsName]['not_start_limit_recs'].length>0 || data['lmt_cls_infos'][clsName]['current_valid_limit_rec'].length>0 && data['lmt_cls_infos'][clsName]['not_start_limit_recs'].length===0){
                             clsQty={};
                             if(startType==='新课'){
                                 endDatePrompt.innerText='';
-                                currentValidLmtCls.innerText=`目前有限时课程生效\n卡号：${data['current_valid_limit_rec'][0][0]}，有效期至${dateFormat(data['current_valid_limit_rec'][0][3])}`;
+                                currentValidLmtCls.innerText=`目前有限时课程生效\n卡号：${data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][0]}，有效期至${dateFormat(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][3])}`;
                                 clsLongBlock.style.display='none';
                                 selectCardBlock.style.display='none';
                                 prompt.innerText='没有待开课的限时课程'
@@ -295,23 +313,23 @@
                                 currentClassResult.style.display='block';
                                 submitButton.style.display='block';
                                 clsLongBlock.style.display='block';
-                                clsLong.innerText=parseInt(data['current_valid_limit_rec'][0][2]);
+                                clsLong.innerText=parseInt(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][2]);
 
                                 selectBuyCodeContainer.innerHTML='';                                
                                 const cardOpt=document.createElement('option');
-                                cardOpt.value=data['current_valid_limit_rec'][0][0];
-                                cardOpt.text=data['current_valid_limit_rec'][0][0];
+                                cardOpt.value=data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][0];
+                                cardOpt.text=data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][0];
                                 selectBuyCodeContainer.append(cardOpt);
-                                selectDate(data['current_valid_limit_rec'][0][1],'startDate','date');
+                                selectDate(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][1],'startDate','date');
                                 startDateSel.disabled=true;
-                                selectDate(data['current_valid_limit_rec'][0][3],'endDate','date');   
-                                clsQty[data['current_valid_limit_rec'][0][0]]=data['current_valid_limit_rec'][0][4]; 
+                                selectDate(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][3],'endDate','date');   
+                                clsQty[data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][0]]=data['lmt_cls_infos'][clsName]['current_valid_limit_rec'][0][4]; 
                                 //验证结束日的有效性，为避免重复添加监听，先移除之前的监听器。
                                 //只有监听器保存在全局变量isInValidEndDateHandler的闭包中才能正确移除。
                                 if(isInValidEndDateHandler){
                                     endDateSel.removeEventListener('change',isInValidEndDateHandler);
                                 }
-                                isInValidEndDateHandler = createEndDateHandler(data, 'current_valid_limit_rec');                                
+                                isInValidEndDateHandler = createEndDateHandler(data['lmt_cls_infos'][clsName], 'current_valid_limit_rec');                                
                                 endDateSel.addEventListener('change',isInValidEndDateHandler);                                
                                 //手动触发change
                                 // selectBuyCodeContainer.dispatchEvent(new Event('change'));    
@@ -319,7 +337,7 @@
                             }
                             
                         //目前 无限时有效课，有待开——可开新课，不可延长
-                        }else if(data['current_valid_limit_rec'].length===0 & data['not_start_limit_recs'].length>0){
+                        }else if(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'].length===0 & data['lmt_cls_infos'][clsName]['not_start_limit_recs'].length>0){
                             clsQty={};
                             if(startType==='新课'){
                                 prompt.innerText=''
@@ -346,15 +364,15 @@
                                 
                                 selectBuyCodeContainer.addEventListener('change',function(){
                                     const cardId=document.getElementById('selectBuyCodeContainer').value;        
-                                    for(i=0;i<data['not_start_limit_recs'].length;i++){
-                                        if(data['not_start_limit_recs'][i][0]===cardId){
+                                    for(i=0;i<data['lmt_cls_infos'][clsName]['not_start_limit_recs'].length;i++){
+                                        if(data['lmt_cls_infos'][clsName]['not_start_limit_recs'][i][0]===cardId){
                                             const today=new Date();
                                             selectDate(today,'startDate','date');
                                             // startDateSel.disabled=true;
                                             const endDate=calculateDate(document.getElementById('startDate').value,parseInt(data['not_start_limit_recs'][i][2]));
                                             console.log(endDate)
                                             selectDate(endDate,'endDate','date');
-                                            clsLong.innerText=parseInt(data['not_start_limit_recs'][i][2]);
+                                            clsLong.innerText=parseInt(data['lmt_cls_infos'][clsName]['not_start_limit_recs'][i][2]);
                                             break;
                                         }
                                     }
@@ -394,7 +412,7 @@
 
                         }
                         //目前 无限时有效课，无待开——不可开新课，不可延长
-                        else if(data['current_valid_limit_rec'].length===0 & data['not_start_limit_recs'].length===0){
+                        else if(data['lmt_cls_infos'][clsName]['current_valid_limit_rec'].length===0 & data['lmt_cls_infos'][clsName]['not_start_limit_recs'].length===0){
                             clsQty={};
                             selectCardBlock.style.display='none';
                             startDateBlock.style.display='none';

@@ -499,7 +499,7 @@
             }
             const validClassEndTime=document.getElementById('validClassEndTime');
             validClassEndTime.textContent='';
-            fetch('/deal_start_limit_page', {
+            fetch('/get_cus_cls_infos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -509,161 +509,82 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('cus buy and limit class infos:', data)
-                    const maxdate_limit_class_sj=data['maxdate_limit_class_sj'];
-                    const lmt_sj_cls_remain=data['lmt_sj_cls_remain'];
-                    const limit_prd_card_id_sj=data['limit_prd_card_id_sj'];
-                    const maxdate_limit_class_grp=data['maxdate_limit_class_grp'];
-                    const limit_prd_card_id_grp=data['limit_prd_card_id_grp'];
-                    const long_prd_sj_card_ids=data['long_prd_sj_card_ids'];
-                    const long_prd_yj_card_ids=data['long_prd_yj_card_ids'];
                     const clsType=document.getElementById('buyType').value;
                     const cardIdSel=document.getElementById('cardIdStr');
                     
                     if (clsType==='限时课程'){
-                        if(maxdate_limit_class_sj){
-                            if(maxdate_limit_class_sj!==''){
-                                //获取的datetime有时间2023-08-06T14:32，只需前面的日期，否则会引起上课日期和结束日是同一天时，不算入有效期内。
+                        const clsName=document.getElementById('buyClsName').value;
+                        for(i=0;i<data['cus_cls_infos'][clsType].length;i++){
+                            const lmtCls=data['cus_cls_infos'][clsType][i];
+                            // console.log(lmtCls)
+                            if(lmtCls[3]===clsName){
+                                
                                 const classDate=document.getElementById('datetime').value.split('T')[0];
-                                // const classDate=new Date('2023-08-06')
-                                // console.log(classDate)
-                                const compareDate=new Date(classDate)-new Date(maxdate_limit_class_sj);
-                                validClassEndTime.textContent=`本卡限时课程结束日：${dateToString(maxdate_limit_class_sj,'date')}`
+                                const compareDate=new Date(classDate)-new Date(lmtCls[1]);
+                                validClassEndTime.textContent=`本卡有效期至：${dateToString(lmtCls[1],'date')}`;
                                 cardId.style.display='block';
-                                // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${limit_prd_card_id_sj}</span>`;
-                                // const cardIdSel=document.getElementById('cardIdStr');
-                                cardIdSel.textContent='';
-                                const opt=document.createElement('option');
-                                opt.value=limit_prd_card_id_sj;
-                                opt.text=limit_prd_card_id_sj;
-                                cardIdSel.appendChild(opt);
-                                console.log('对比选择日及最后生效课程结束日：',compareDate);
                                 allTrainContents.style.display='block';
+                                cardIdSel.textContent='';
+                                errBuyType.textContent=''
+                                const opt=document.createElement('option');
+                                opt.value=lmtCls[0];
+                                opt.textContent=lmtCls[0];
+                                cardIdSel.append(opt);
                                 if(compareDate>0){
                                     allTrainContents.style.display='none';
                                     validClassEndTime.textContent='';
                                     cardId.style.display='none';
-                                    errBuyType.textContent='无有效的限时课程';
-                                    // alert('无有效的限时课程')
+                                    errBuyType.textContent='无有效课程';
                                 }
-                                //监听select
-                                showClsRemain([[limit_prd_card_id_sj,maxdate_limit_class_sj,lmt_sj_cls_remain]]);
+                                showClsRemain([[lmtCls[0],lmtCls[1],lmtCls[2]]]);
+                                break;
+                            }else{
+                                allTrainContents.style.display='none';
+                                validClassEndTime.textContent='';
+                                cardId.style.display='none';
+                                errBuyType.textContent='无有效课程';
                             }
-                        }else{
-                            allTrainContents.style.display='none';
-                            validClassEndTime.textContent='';
-                            cardId.style.display='none';
-                            errBuyType.textContent='无有效的限时课程';
-                            // alert('无有效的限时课程')
                         }
-                        //手动触发select
                         const event=new Event('change');
-                        cardIdSel.dispatchEvent(event);   
-                    }else if (clsType==='限时团课'){
-                        if(maxdate_limit_class_grp){
-                            if(maxdate_limit_class_grp!==''){
-                                //获取的datetime有时间2023-08-06T14:32，只需前面的日期，否则会引起上课日期和结束日是同一天时，不算入有效期内。
-                                const classDate=document.getElementById('datetime').value.split('T')[0];
-                                // const classDate=new Date('2023-08-06')
-                                // console.log(classDate)
-                                const compareDate=new Date(classDate)-new Date(maxdate_limit_class_grp);
-                                validClassEndTime.textContent=`本卡限时课程结束日：${dateToString(maxdate_limit_class_grp,'date')}`
-                                cardId.style.display='block';
-                                // const cardIdSel=document.getElementById('cardIdStr');
-                                cardIdSel.textContent='';
+                        cardIdSel.dispatchEvent(event); 
+                    }
+
+                    if (clsType==='常规课程'){
+                        const clsName=document.getElementById('buyClsName').value;
+                        cardId.style.display='block';
+                        cardIdSel.textContent='';
+                        errBuyType.textContent='';
+                        for(i=0;i<data['cus_cls_infos'][clsType].length;i++){
+                            const lmtCls=data['cus_cls_infos'][clsType][i];
+                            // console.log(lmtCls)
+                            if(lmtCls[3]===clsName){                                
+                                const classDate=document.getElementById('datetime').value.split('T')[0];                                
+                                // validClassEndTime.textContent=`本卡有效期至：${dateToString(lmtCls[1],'date')}`;                                
                                 const opt=document.createElement('option');
-                                opt.value=limit_prd_card_id_grp;
-                                opt.text=limit_prd_card_id_grp;
-                                cardIdSel.appendChild(opt);
-                                cardIdSel.innerHTML=`关联卡号：<select id='cardIdStr'>${limit_prd_card_id_grp}</select>`;
-                                console.log('对比选择日及最后生效课程结束日：',compareDate);
-                                allTrainContents.style.display='block';
-                                if(compareDate>0){
-                                    allTrainContents.style.display='none';
-                                    validClassEndTime.textContent='';
-                                    cardId.style.display='none';
-                                    errBuyType.textContent='无有效的限时课程';
-                                    // alert('无有效的限时课程')
-                                }
-                            }
-                        }else{
-                            allTrainContents.style.display='none';
-                            validClassEndTime.textContent='';
-                            cardId.style.display='none';
-                            errBuyType.textContent='无有效的限时课程';
-                            // alert('无有效的限时课程')
-                        }
-                    }else if(clsType==='常规课程' ){
-                        if(clsName.value==='私教'){
-                            const normalClassRemainSj=classAndBodyHistory['剩余节数-常规课程-私教'];      
-                            if(normalClassRemainSj && normalClassRemainSj>0){
-                                errBuyType.textContent='';
-                                allTrainContents.style.display='block';
-                                cardId.style.display='block';
-                                // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${long_prd_sj_card_id}</span>`;
-                                
-                                cardIdSel.textContent='';
-                                long_prd_sj_card_ids.forEach((lg_id,index)=>{
-                                    console.log(lg_id[0])
-                                    const opt=document.createElement('option');
-                                    opt.value=lg_id[0];
-                                    opt.text=lg_id[0];
-                                    cardIdSel.appendChild(opt);
-                                    if(index===0){
-                                        opt.selected=true;
-                                    }
-                                    //监听select
-                                    showClsRemain(long_prd_sj_card_ids);
-                                });   
-                            }else{
-                                errBuyType.textContent='无常规课程';
-                                allTrainContents.style.display='none';
-                                cardId.style.display='none';
+                                opt.value=lmtCls[0];
+                                opt.textContent=lmtCls[0];
+                                cardIdSel.append(opt);                                
+                                showClsRemain([[lmtCls[0],lmtCls[1],lmtCls[2]]]);                                
                             }
                         }
-                        
-                        if(clsName.value==='瑜伽'){
-                            const normalClassRemainYj=classAndBodyHistory['剩余节数-常规课程-瑜伽'];      
-                            if(normalClassRemainYj && normalClassRemainYj>0){
-                                errBuyType.textContent='';
-                                allTrainContents.style.display='block';
-                                cardId.style.display='block';
-                                // cardId.innerHTML=`关联卡号：<span id='cardIdStr'>${long_prd_sj_card_id}</span>`;
-                                
-                                cardIdSel.textContent='';
-                                long_prd_yj_card_ids.forEach((lg_id,index)=>{
-                                    console.log(lg_id[0])
-                                    const opt=document.createElement('option');
-                                    opt.value=lg_id[0];
-                                    opt.text=lg_id[0];
-                                    cardIdSel.appendChild(opt);
-                                    if(index===0){
-                                        opt.selected=true;
-                                    }
-                                    //监听select
-                                    showClsRemain(long_prd_yj_card_ids);
-                                });   
-                            
-                            }else{
-                                errBuyType.textContent='无瑜伽课程';
-                                allTrainContents.style.display='none';
-                                cardId.style.display='none';
-                            }
-                        }
-                                                 
-                        
-                        //手动触发select
+
+
                         const event=new Event('change');
-                        cardIdSel.dispatchEvent(event)                        
-                    }else if(clsType==='常规团课' ){
-                        const normalClassGroupRemain=classAndBodyHistory['剩余节数-常规团课'];
-                        if(normalClassGroupRemain && normalClassGroupRemain>0){
+                        cardIdSel.dispatchEvent(event); 
+
+                        if(cardIdSel.value){
+                            allTrainContents.style.display='block'; 
+                            cardId.style.display='block';
                             errBuyType.textContent='';
-                            allTrainContents.style.display='block';
                         }else{
-                            errBuyType.textContent='无常规团课';
-                            allTrainContents.style.display='none';
+                            allTrainContents.style.display='none'; 
+                            validClassEndTime.textContent='';
+                            cardId.style.display='none';
+                            errBuyType.textContent='无有效课程';
                         }
                     }
+
+
                     
                 })
                 .catch(error=>{                    
