@@ -15,18 +15,7 @@
         <div id="cusClsTkn" class="cusClsTkn"></div>   
         <hr>   
     <div id="BasicInfo" style="padding:10px;">   
-        <h2>上课基本信息</h2>  
-        <!-- <div>        
-            <h3><image src="../static/ico/性别.svg" class="ico"></image> 客户性别</h3>
-            <label>
-                <input type="radio" id="gender" name='gender' value='男'>
-                男
-            </label>
-            <label>
-            <input type="radio" id="gender" name='gender' value='女'checked>
-                女
-            </label>
-        </div> -->
+        <h2>上课基本信息</h2> 
         <div id="insSelectBlock">
             <h3>上课教练</h3>
             <select id="insSelect"></select>
@@ -395,7 +384,7 @@
                             })
                         .then(response=>response.json())
                         .then(class_histrory_body_data=>{
-                            console.log('classAndBodyHistory:',class_histrory_body_data);
+                            // console.log('classAndBodyHistory:',class_histrory_body_data);
                             classAndBodyHistory=class_histrory_body_data;
                             reportClassTaken();                    
                             getValidClass(name);
@@ -442,7 +431,7 @@
 
 
         function getValidCards(cusName){
-            console.log(cusName)
+            // console.log(cusName)
             fetch('/get_cards', {
                 method: 'POST',
                 headers: {
@@ -454,12 +443,12 @@
                 .then(data => {
                     const validCards=data['valid_cards'];
                     const cardSel=document.getElementById('cards');
-                    console.log(validCards)
+                    // console.log(validCards)
                     cardSel.textContent='';
                     //生成下拉的有效卡号供销课用
                     validCards.forEach((card,index)=>{
                         const option=document.createElement('option');
-                        console.log(card)
+                        // console.log(card)
                         option.value=card[0];
                         option.text=card[0];                        
                         if(index===0){
@@ -513,11 +502,11 @@
                     const cardIdSel=document.getElementById('cardIdStr');
                     
                     if (clsType==='限时课程'){
-                        const clsName=document.getElementById('buyClsName').value;
+                        const clsNameValue=clsName.value;
                         for(i=0;i<data['cus_cls_infos'][clsType].length;i++){
                             const lmtCls=data['cus_cls_infos'][clsType][i];
-                            // console.log(lmtCls)
-                            if(lmtCls[3]===clsName){
+                            console.log(lmtCls)
+                            if(lmtCls[3]===clsNameValue){
                                 
                                 const classDate=document.getElementById('datetime').value.split('T')[0];
                                 const compareDate=new Date(classDate)-new Date(lmtCls[1]);
@@ -540,13 +529,27 @@
                                 break;
                             }else{
                                 allTrainContents.style.display='none';
+                                cardIdSel.textContent='';
                                 validClassEndTime.textContent='';
                                 cardId.style.display='none';
                                 errBuyType.textContent='无有效课程';
+                                break;
                             }
                         }
-                        const event=new Event('change');
-                        cardIdSel.dispatchEvent(event); 
+                        const eventCardId=new Event('change');
+                        cardIdSel.dispatchEvent(eventCardId); 
+                        if(cardIdSel.value){
+                            allTrainContents.style.display='block'; 
+                            cardId.style.display='block';
+                            errBuyType.textContent='';
+                        }else{
+                            allTrainContents.style.display='none'; 
+                            validClassEndTime.textContent='';
+                            cardId.style.display='none';
+                            errBuyType.textContent='无有效课程';
+                        }
+
+                                                
                     }
 
                     if (clsType==='常规课程'){
@@ -628,14 +631,14 @@
             data=classAndBodyHistory;
             // 递归替换Undefined值为-
             data=replaceUndefinedWithDash(data);
-            console.log('cus buy and body data',data);
+            // console.log('cus buy and body data',data);
             let normalClassRemain;
             const cusName=document.getElementById('nameInput').value;
             const classTakenInfo=document.getElementById('cusClsTkn');
             classTakenInfo.style.display='block';
             classTakenInfo.innerHTML=''
-            console.log('reported by Name:',cusName);
-            console.log('data:',data)
+            // console.log('reported by Name:',cusName);
+            // console.log('data:',data)
             const total_cls_tkn_qty=data['上课次数-常规课程-私教']+data['上课次数-常规课程-瑜伽']+data['上课次数-限时课程-私教']+data['上课次数-限时团课']+data['上课次数-常规团课']
             
             
@@ -661,6 +664,17 @@
                         // bfr=(parseFloat(data['bfr'])*100).toFixed(2)
                         bfr=isNaN(parseFloat((data['bfr']*100).toFixed(2)))?'-':(data['bfr']*100).toFixed(2);
                     }
+                    let clsTknHtml='';
+                    for(let key in data){
+                        if(key.slice(0,5)==='上课次数-'){
+                            if(data[key]!==0){
+                                clsTknHtml=clsTknHtml+`<p style="margin-left: 25px; font-size:12px;"><span>- ${key.slice(5,).replace('-',' · ')} </span>${data[key]}  节</p>&#10; `
+                            }
+                            
+                        }}
+                    
+                    clsTknHtml=clsTknHtml.trim();
+
                     classTakenInfo.innerHTML=`
                             <h2 style="color:#fafafa;">以往上课及体测情况</h2>
                             <div >
@@ -672,11 +686,10 @@
                             </div>
                             <hr>
                             <div >
-                            <p><span>· 上课总节数： </span>${data['上课总次数']}  节</p>
-                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规私教课程： </span>${data['上课次数-常规课程-私教']}  节</p>
-                            <p style="margin-left: 25px; font-size:12px;"><span>- 常规瑜伽课程： </span>${data['上课次数-常规课程-瑜伽']}  节</p>
-                            <p style="margin-left: 25px;font-size:12px;"><span>- 限时课程： </span>${data['上课次数-限时课程-私教']}  节</p>
-                            </div>
+                            <p><span>· 上课总节数： </span>${data['上课总次数']}  节</p>`
+                            +clsTknHtml
+                            +
+                            `</div>
                             <hr>
                             <div >
                             <p><span>· 围度测量次数 </span>${data['msr_num']}  </p>
