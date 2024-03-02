@@ -234,7 +234,13 @@
                 .then(data=>{
                     // console.log(data['result']);
                     // location.reload();
-                    alert("开课/延期成功");
+                    const btnText=document.getElementById('submit').textContent;
+                    if(btnText==='新课'){
+                        alert("开课成功");
+                    }else{
+                        alert("延期成功");
+                    }
+                    
                     window.location.replace('./index');
                 })
                 .catch(error=>{
@@ -428,6 +434,13 @@
                             }
                             
                         }
+                    }
+
+                    const btn=document.getElementById('submit');
+                    if(startType==='新课'){                        
+                        btn.textContent='开课';
+                    }else{
+                        btn.textContent='延长';
                     }
                 })         
                 
